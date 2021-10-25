@@ -1,0 +1,68 @@
+{% extends 'ewallet/base.html' %}
+
+{% block title %}
+<title>Store</title>
+{% endblock %}
+
+{% block content2 %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+     <div class="container-fluid px-0">
+          <div class="row gy-4">
+               <div class="col-lg-10">
+                    <h2 class="mb-0 p-1">Store</h2>
+               </div>               
+          </div>
+     </div>
+</header>
+
+<!-- Display product in cards -->
+<!-- <div class="row">
+     {% for product in products %}
+
+     <div class="col-lg-4">
+          <img class="thumbnail" src="{{product.imageURL}}">
+          <div class="box-element product">
+               <h6><strong>{{product.name}}</strong></h6>
+               <hr>
+               <h6>{{product.description}}</h6>
+
+               <button data-product="{{product.id}}" data-action="add" class="btn 
+               btn-outline-secondary add-btn update-cart">Add to Cart</button>
+               <a class="btn btn-outline-success" href="#">View</a>
+               <h4 style="float:right"><strong>RM{{product.price|floatformat:2}}</strong></h4>
+
+          </div>
+     </div>
+     {% endfor %}
+
+</div> -->
+
+<!-- Product Section -->
+<section class="tables">
+     <div class="container-fluid">
+          <div class="row gy-4">
+               {% for product in products %}
+
+               <div class="col-lg-4">
+                    <!-- <img class="thumbnail" src="{{product.imageURL}}"> -->
+                    <div class="box-element product">
+                         <h6><strong>{{product.name}}</strong></h6>
+                         <hr>
+                         <h6>{{product.description}}</h6>
+
+                         <button data-product="{{product.id}}" data-action="add" class="btn 
+                    btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                         <a class="btn btn-outline-success" href="#">View</a>
+                         <h4 style="float:right"><strong>RM{{product.price|floatformat:2}}</strong></h4>
+
+                    </div>
+               </div>
+               {% endfor %}
+
+          </div>
+     </div>
+</section>
+
+{% endblock %}

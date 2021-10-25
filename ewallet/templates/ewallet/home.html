@@ -1,0 +1,238 @@
+{% extends 'ewallet/base.html' %}
+
+{% block title %}
+<title>Home</title>
+{% endblock %}
+
+{% block content2 %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <h2 class="mb-0 p-1">Dashboard</h2>
+    </div>
+</header>
+
+<!-- Wallet Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="card mb-0">
+            <div class="card-body">
+                <div class="row gx-5 bg-white">
+                    <!-- Parent Wallet -->
+                    <div class="col-xl-4 col-sm-6 py-4 border-lg-end border-gray-200">
+                        <div class="d-flex align-items-center">
+                            <div class="icon flex-shrink-0 bg-violet">
+                                <i class="fas fa-university" aria-hidden="true"></i>
+                            </div>
+                            <div class="mx-3">
+                                <h6 class="h4 fw-light mb-1"><strong class="text-lg">My Wallet</strong></h6>
+                                <div class="number text-gray-600 ">RM {{ pw|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% for s_wallet in sw %}                    
+                    <div class="col-xl-4 col-sm-6 py-4 border-lg-end border-gray-200">
+                        <div class="d-flex align-items-center">
+                            <div class="icon flex-shrink-0 bg-red">
+                                <i class="fas fa-university" aria-hidden="true"></i>
+                            </div>
+                            <div class="mx-3">
+                                <h6 class="h4 fw-light mb-1"><strong class="text-lg">{{ s_wallet.student }}</strong>
+                                </h6>
+                                <div class="number text-gray-600 ">RM {{ s_wallet.balance|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2nd Section-->
+<section class="pb-0">
+    <div class="container-fluid">
+        <div class="row gy-4">
+
+            <!-- Recent Transactions -->
+            <div class="col-lg-8">
+                <div class="card mb-0">
+                    <div class="card-header">
+                        <div class="card-close">
+                            <div class="dropdown">
+                                <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                        class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
+                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-0">Recent Transactions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-hover">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Transaction Type</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                {% for transaction in transactions %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{ transaction.transaction_id }}</td>
+                                        <td>{{ transaction.transaction_type }}</td>
+                                        <td>{{ transaction.description }}</td>
+                                        <td>{{ transaction.amount|floatformat:2 }}</td>
+                                        <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Updates-->
+            <div class="col-lg-4">
+                <div class="card mb-0">
+                    <div class="card-header position-relative px-4">
+                        <div class="card-close">
+                            <div class="dropdown">
+                                <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                        class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
+                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-0">School Notices</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Item-->
+                        <div class="p-3 d-flex justify-content-between">
+                            <div class="d-flex"><i class="fas fa-rss text-gray-600"></i>
+                                <div class="ms-3">
+                                    <h5 class="fw-normal text-gray-600 mb-1">Lorem ipsum dolor sit amet.
+                                    </h5>
+                                    <p class="mb-0 text-xs text-gray-500">Lorem ipsum dolor sit amet,
+                                        consectetur adipisicing elit sed.</p>
+                                </div>
+                            </div>
+                            <div class="text-end ms-2"><strong
+                                    class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
+                                    class="d-block lh-1 text-gray-500">May</small></div>
+                        </div>
+                        <!-- Item-->
+                        <div class="p-3 d-flex justify-content-between bg-light">
+                            <div class="d-flex"><i class="fas fa-rss text-gray-600"></i>
+                                <div class="ms-3">
+                                    <h5 class="fw-normal text-gray-600 mb-1">Lorem ipsum dolor sit amet.
+                                    </h5>
+                                    <p class="mb-0 text-xs text-gray-500">Lorem ipsum dolor sit amet,
+                                        consectetur adipisicing elit sed.</p>
+                                </div>
+                            </div>
+                            <div class="text-end ms-2"><strong
+                                    class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
+                                    class="d-block lh-1 text-gray-500">May</small></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Charts Section-->
+<section class="charts">
+    <div class="container-fluid">
+        <div class="row gy-4 align-items-stretch">
+            <!-- Line Charts-->
+            <div class="col-lg-8">
+                <div class="card mb-0 h-100">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="card-close">
+                            <div class="dropdown">
+                                <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                        class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
+                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-0">Line Chart Example</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="lineChartExample" style="width:100%;max-width:600px"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-0">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="card-close">
+                            <div class="dropdown">
+                                <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                        class="fas fa-ellipsis-v"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
+                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                            </div>
+                        </div>
+                        <h3 class="h4 mb-0">Line Chart Example</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="lineChartExample1"></canvas>
+                    </div>
+                </div>
+                <div class="card mb-0">
+                    <div class="card-close">
+                        <div class="dropdown">
+                            <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
+                                data-bs-toggle="dropdown" aria-expanded="false"><i
+                                    class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
+                                    class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                        class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                    href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="lineChartExample2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

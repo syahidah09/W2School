@@ -1,0 +1,149 @@
+{% extends 'ewallet/base.html' %}
+
+{% block title %}
+<title>Wallet</title>
+{% endblock %}
+
+{% block content2 %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="col-lg-3">
+                <h2 class="mb-0 p-1">Wallets</h2>
+            </div>
+            <div class="col-lg-4 offset-md-5">
+                <button class="btn btn-sm btn-info d-inline" type="button" data-bs-toggle="modal"
+                    data-bs-target="#myModal">Reload
+                    Child</button>
+                <a class="btn btn-sm btn-info d-inline" href="{% url 'ewallet:add_dependent' %}">Add New Dependent</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+
+            <!-- Parent wallet (myWallet)-->
+            <div class="col-lg-4">
+                <div class="card bg-light mb-1 border-primary">
+                    <div class="card-header">
+                        <h3 class="h4 mb-0">My Wallet</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>RM {{ pwb|floatformat:2 }}</p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTopUp" aria-expanded="false" aria-controls="collapseTopUp">
+                            Top Up
+                        </button>
+                        <div class="row justify-content-center">
+                            <div class="collapse" id="collapseTopUp">
+                                <div class="col-auto mt-4" id="payment-info">
+                                    <div id="paypal-button-container"></div>
+                                    <script src="https://www.paypal.com/sdk/js?client-id=test"></script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students wallet -->
+            {% for s_wallet in sw %}
+            <div class="col-lg-4">
+                <div class="card bg-light mb-1 border-primary">
+                    <div class="card-header">
+                        <h3 class="h4 mb-0">{{ s_wallet.student.name }}</h3>
+                    </div>
+                    <div class="card-body ">
+                        <p>RM {{ s_wallet.balance|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- Modal-->
+            <div class="modal fade text-start" id="myModal" tabindex="-1" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">Transfer </h5>
+                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for message in messages %}
+                            <p>{{message}}</p>
+                            {% endfor %}
+                            <p>How much do you want to transfer?</p>
+                            <form class="form-horizontal" method="POST" action="">
+                                {% csrf_token %}
+                                <!-- {{ s_wallet.student.student_id }} -->
+                                <div class="col-sm-9">
+                                    <div class="input-group mb-3">
+                                        <label class="input-group-text" for="inputGroupSelect01">Student</label>
+                                        <select class="form-select" id="inputGroupSelect01">
+                                            <option selected>-----------</option>
+                                            {% for s_wallet in sw %}
+                                            <option value="{{ s_wallet.student.student_id }}">{{
+                                                s_wallet.student.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">RM</span>
+                                        <input type="number" class="form-control"
+                                            aria-label="Dollar amount (with dot and two decimal places)">
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-primary" type="submit">Confirm</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        style: {
+            color: 'blue',
+            shape: 'pill',
+            label: 'pay',
+            height: 40
+        },
+
+        // Set up the transaction
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '{{order.get_cart_total}}'
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                submitFormData()
+                // Show a success message to the buyer
+
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+</script>
+
+{% endblock %}

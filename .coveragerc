@@ -1,0 +1,22 @@
+# .coveragerc to control coverage.py
+[run]
+include = ./*
+branch = True
+omit =
+    */account/*  
+    */tests/*   
+    */migrations/*
+    */__init__.py
+
+[report]
+sort = Cover
+precision = 2
+ignore_errors = True
+
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+    raise AssertionError
+
