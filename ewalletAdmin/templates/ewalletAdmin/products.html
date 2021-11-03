@@ -70,10 +70,10 @@
                                         <td>{{product.price}}</td>
                                         <td>{{product.quantity}}</td>
                                         <td><a class="btn btn-sm btn-info"
-                                                href="{% url 'ewalletAdmin:update_product' product.id %}">Update</a>
+                                                href="{% url 'ewalletAdmin:update_product' product.id %}"><i class="fa fa-pencil fa-fw"></i>Edit</a>
                                         </td>
                                         <td><a class="btn btn-sm btn-danger"
-                                                href="{% url 'ewalletAdmin:delete_product' product.id %}">Delete</a>
+                                                href="{% url 'ewalletAdmin:delete_product' product.id %}"><i class="fa fa-trash-o fa-fw"></i>Delete</a>
                                         </td>
                                     </tr>
                                 </tbody>

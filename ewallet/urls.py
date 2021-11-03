@@ -1,27 +1,27 @@
 from django.urls import path
-from .views import (
-    registerPage,
-    loginPage,
-    logoutUser,
-
-    homepage,
-    wallet_page,      
-    transaction_history,     
-    store,
-    add_dependent,    
-)
+from . import views
 
 app_name = 'ewallet'
 urlpatterns = [
-    path('register/', registerPage, name='register'),
-    path('login/', loginPage, name='login'),
-    path('logout/', logoutUser, name='logout'),
+    path('', views.frontPage, name=''),
+    path('register/', views.registerPage, name='register'),
+    path('login/', views.loginPage, name='login'),
+    path('logout/', views.logoutUser, name='logout'),
 
-    path('home/', homepage, name='home'), 
-    path('wallet/', wallet_page, name='wallet'),    
-    path('transaction_history/', transaction_history, name='transaction_history'),    
-    path('store/', store, name='store'),
+    path('home/', views.homepage, name='home'), 
+    path('wallet/', views.wallet_page, name='wallet'), 
+    path('topup/', views.topup_page, name='topup'),
+    path('reload/', views.reload, name='reload'),     
+    path('transaction_history/', views.transaction_history, name='transaction_history'),
+    path('process_transaction/', views.processTransaction, name="process_transaction"),
+    path('process_reload/', views.processReload, name="process_reload"),     
+
+    path('store/', views.store, name='store'),
+    path('cart/', views.cart, name="cart"),
+	path('checkout/', views.checkout, name="checkout"),
+    path('update_item/', views.updateItem, name="update_item"),
+    path('process_order/', views.processOrder, name="process_order"),  
     
-    path('add_dependent/', add_dependent, name='add_dependent'),    
+    path('add_dependent/', views.add_dependent, name='add_dependent'),    
 
 ]

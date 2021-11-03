@@ -7,13 +7,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+    <script type="text/javascript">
+        var user = '{{request.user}}'
+    
+        function getToken(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        const csrftoken = getToken('csrftoken');
+    
+      </script>
+
     <!-- Bootstrap5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <!-- Bootstrap Font Icon CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <!-- Font Awesome CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
         integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ"
         crossorigin="anonymous"></script>
@@ -31,6 +53,9 @@
     <link rel="stylesheet" href="https://cdn.tutorialjinni.com/choices.js/9.0.1/choices.min.css">
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
+    <!-- W3.CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="{% static 'css/w3-theme-teal.css' %}">
 
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}"> -->
 
@@ -47,19 +72,22 @@
 
     <div class="page-content d-flex align-items-stretch">
         <!-- Side Navbar -->
-        <nav class="side-navbar z-index-40">
+        <nav class="side-navbar z-index-40 w3-theme">
             <!-- Sidebar Header-->
-            <div class="sidebar-header d-flex align-items-center py-4 px-3"><img
-                    class="avatar shadow-0 img-fluid rounded-circle" src="{% static 'img/avatar-1.jpg' %}" alt="...">
+            <div class="sidebar-header d-flex align-items-center py-4 px-3">
+                <i class="fas fa-user-circle me-xl-3 fa-4x" aria-hidden="true"></i>
+                <!-- <img
+                    class="avatar shadow-0 img-fluid rounded-circle" src="{% static 'img/avatar-1.jpg' %}" alt="..."> -->
                 <div class="ms-3 title">
                     <h1 class="h4 mb-2">{{request.user}}</h1>
+                    <a href="">Edit Profile  <i class="fas fa-pencil-alt me-xl-3" aria-hidden="true"></i></a>
                     <!-- <p class="text-sm text-gray-500 fw-light mb-0 lh-1">Web Designer</p> -->
                 </div>
             </div>
-            <!-- Sidebar Navidation Menus--><span
-                class="text-uppercase text-gray-400 text-xs letter-spacing-0 mx-3 px-2 heading">Main</span>
+            <!-- Sidebar Navidation Menus-->
+            <span class="text-uppercase text-gray-400 text-xs letter-spacing-0 mx-3 px-2 heading">Main</span>
             <ul class="list-unstyled py-4">
-                <li class="sidebar-item active"><a class="sidebar-link" href="{% url 'ewallet:home' %}">
+                <li class="sidebar-item"><a class="sidebar-link" href="{% url 'ewallet:home' %}">
                         <i class="fas fa-home me-xl-3" aria-hidden="true"></i>Dashboard </a></li>
                 <li class="sidebar-item"><a class="sidebar-link" href="{% url 'ewallet:wallet' %}">
                         <i class="fas fa-university me-xl-3" aria-hidden="true"></i>Wallet </a></li>
@@ -91,13 +119,13 @@
             {% endblock %}
 
             <!-- Page Footer-->
-            <footer class="position-absolute bottom-0 bg-darkBlue text-white text-center py-3 w-100 text-xs"
+            <footer class="position-absolute bottom-0 w3-theme-l4 text-white text-center py-3 w-100 text-xs"
                 id="footer">
                 <div class="container-fluid">
                     <div class="row gy-2">
                         <div class="col-sm-6 text-sm-start">
                             <p class="mb-0">Wallet2School &copy; 2021</p>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
             </footer>
@@ -113,17 +141,18 @@
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
     <!-- jQuery Custom Scroller CDN -->
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script> -->
 
     <!-- JavaScript files-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- <script src="vendor/just-validate/js/just-validate.min.js"></script> -->
     <script src="https://cdn.tutorialjinni.com/choices.js/9.0.1/choices.js"></script>
     <script src="https://cdn.tutorialjinni.com/choices.js/9.0.1/choices.min.js"></script>
-    <script src="{% static 'js/charts-custom.js' %}"></script>
+    <!-- <script src="{% static 'js/charts-custom.js' %}"></script> -->
     <!-- Main File-->
     <script src="{% static 'js/front.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/cart2.js' %}"></script>
 
     <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"

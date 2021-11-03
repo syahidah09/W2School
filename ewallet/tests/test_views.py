@@ -41,6 +41,8 @@ class EwalletViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_if_not_logged_in(self):
+        # if user.groups.filter(name="parent"):
+        # print("User " + user.username + " is in a group parent")
         response = self.client.get('/home/')
         # Manually check redirect (Can't use assertRedirect, because the redirect URL is unpredictable)
         self.assertEqual(response.status_code, 302)

@@ -1,6 +1,5 @@
 from django.forms import ModelForm
-from ewallet.models import Student
-from .models import Product
+from ewallet.models import Student, Product
 
 class ProductForm(ModelForm):
     class Meta:
