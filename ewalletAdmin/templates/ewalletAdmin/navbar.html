@@ -2,7 +2,7 @@
 
 <!-- Main Navbar-->
 <header class="header z-index-50">
-  <nav class="navbar py-3 px-0 shadow-sm text-white position-relative">
+  <nav class="navbar py-3 px-0 shadow-sm w3-theme-d2 bg-gradient text-white position-relative">
     <!-- Search Box-->
     <div class="search-box shadow-sm">
       <button class="dismiss d-flex align-items-center">
@@ -12,6 +12,7 @@
         <input class="form-control shadow-0" type="text" placeholder="What are you looking for...">
       </form>
     </div>
+
     <div class="container-fluid w-100">
       <div class="navbar-holder d-flex align-items-center justify-content-between w-100">
         <!-- Navbar Header-->
@@ -32,24 +33,24 @@
               <i class="fas fa-search" aria-hidden="true"></i></a></li>
           <!-- Notifications-->
           <li class="nav-item dropdown"> <a class="nav-link text-white" id="notifications" href="#"
-            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-bell" aria-hidden="true"></i><span
-              class="badge bg-red badge-corner fw-normal">12</span></a>
-          <ul class="dropdown-menu dropdown-menu-end mt-3 shadow-sm" aria-labelledby="notifications">
-            <li><a class="dropdown-item py-3" href="#">
-                <div class="d-flex">
-                  <div class="icon icon-sm bg-blue">
-                    <i class="fas fa-question-circle" aria-hidden="true"></i>
+              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-bell" aria-hidden="true"></i><span
+                class="badge bg-red badge-corner fw-normal">12</span></a>
+            <ul class="dropdown-menu dropdown-menu-end mt-3 shadow-sm" aria-labelledby="notifications">
+              <li><a class="dropdown-item py-3" href="#">
+                  <div class="d-flex">
+                    <div class="icon icon-sm bg-blue">
+                      <i class="fas fa-question-circle" aria-hidden="true"></i>
+                    </div>
+                    <div class="ms-3"><span class="h6 d-block fw-normal mb-1 text-xs text-gray-600">You have 6
+                        new messages </span><small class="small text-gray-600">4 minutes
+                        ago</small></div>
                   </div>
-                  <div class="ms-3"><span class="h6 d-block fw-normal mb-1 text-xs text-gray-600">You have 6
-                      new messages </span><small class="small text-gray-600">4 minutes
-                      ago</small></div>
-                </div>
-              </a></li>
-            <li><a class="dropdown-item all-notifications text-center" href="#"> <strong
-                  class="text-xs text-gray-600">View all notifications </strong></a></li>
-          </ul>
-        </li>
+                </a></li>
+              <li><a class="dropdown-item all-notifications text-center" href="#"> <strong
+                    class="text-xs text-gray-600">View all notifications </strong></a></li>
+            </ul>
+          </li>
           <!-- Messages                        -->
           <li class="nav-item dropdown"> <a class="nav-link text-white" id="messages" rel="nofollow" href="#"
               data-bs-toggle="dropdown" aria-expanded="false">
@@ -91,7 +92,8 @@
           </li>
 
           <!-- Logout    -->
-          <li class="nav-item"><a class="nav-link text-white" href=""> <span class="d-none d-sm-inline">Logout</span>
+          <li class="nav-item"><a class="nav-link text-white" href="{% url 'ewallet:logout' %}"> <span
+                class="d-none d-sm-inline">Logout</span>
             </a></li>
         </ul>
       </div>

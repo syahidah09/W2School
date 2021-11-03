@@ -1,0 +1,180 @@
+{% extends 'ewallet/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Checkout</title>
+{% endblock %}
+
+{% block content2 %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 align-items-center">
+                <a class="me-3" href="{% url 'ewallet:cart' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <h2 class="me-auto my-0">Checkout</h2>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <!-- Cart item -->
+        <div class="row gy-4">
+            <div class="col-lg-6">
+                <div class="card card-body mb-0" id="form-wrapper">
+                    <h3>Order Summary</h3>
+                    <hr>
+                    {% for item in items %}
+                    <div class="cart-row">
+                        <!-- <div style="flex:2"><img class="row-image img-fluid" src="{{item.product.imageURL }}"></div> -->
+                        <div style="flex:2">
+                            <p>{{item.product.name}}</p>
+                        </div>
+                        <div style="flex:1">
+                            <p>RM{{item.product.price|floatformat:2}}</p>
+                        </div>
+                        <div style="flex:1">
+                            <p>x{{item.quantity}}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <h5>Items: {{order.get_cart_items}}</h5>
+                    <h5>Total: RM{{order.get_cart_total|floatformat:2}}</h5>
+                    <br>
+                    <form id="form">
+                        <div id="shipping-info">
+                            <h5>Shipping Information:</h5>
+                            <hr>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="address" placeholder="Address..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="city" placeholder="City..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="state" placeholder="State..">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                            </div>
+                        </div>
+                        <hr>
+                        <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+                    </form>
+                </div>
+
+                <br>
+                <div class="card card-body mb-0 hidden" id="payment-info">
+                    <h5>Payment Methods:</h5>
+                    <hr>
+                    <div id="paypal-button-container"></div>
+                    <script>paypal.Buttons().render('body');</script>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script
+    src="https://www.paypal.com/sdk/js?client-id=ATzyeTiGEsu0HuzdhVamKQVJ_plMhONzIHh7WrsbpyopN9iN5FnBjUtWpuTXX0jm-h-w4XRSMH3Ux8xk&currency=MYR"></script>
+
+<script>
+    total = '{{order.get_cart_total}}'
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        style: {
+            color: 'blue',
+            shape: 'pill',
+            label: 'paypal',
+            height: 35,
+            tagline: false
+        },
+
+        // Set up the transaction
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: parseFloat(total).toFixed(2)
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                submitFormData()
+                // Show a success message to the buyer                
+            });
+        }
+
+
+    }).render('#paypal-button-container');
+</script>
+
+<script type="text/javascript">
+    var total = '{{order.get_cart_total}}'
+
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form submitted...')
+        document.getElementById('form-button').classList.add("hidden");
+        document.getElementById('payment-info').classList.remove("hidden");
+    })
+
+    function submitFormData() {
+        console.log('Payment btn clicked')
+
+        var userFormData = {
+            'name': null,
+            'email': null,
+            'total': total,
+        }
+
+        var shippingInfo = {
+            'address': null,
+            'city': null,
+            'state': null,
+            'zipcode': null,
+        }
+
+        shippingInfo.address = form.address.value
+        shippingInfo.city = form.city.value
+        shippingInfo.state = form.state.value
+        shippingInfo.zipcode = form.zipcode.value
+
+        if (user == 'AnonymousUser') {
+            userFormData.name = form.name.value
+            userFormData.email = form.email.value
+        }
+
+        var url = '/process_order/'
+        //post request
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo })
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewallet:store' %}"
+            })
+    }
+</script>
+
+{% endblock %}

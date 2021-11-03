@@ -10,9 +10,10 @@
 <header class="bg-white shadow-sm px-4 py-3 z-index-20">
      <div class="container-fluid px-0">
           <div class="row gy-4">
-               <div class="col-lg-10">
-                    <h2 class="mb-0 p-1">Store</h2>
-               </div>               
+               <div class="d-flex mb-0 justify-content-between align-items-center">
+                    <h2 class="mb-0 mt-1">Store</h2>
+                    <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewallet:cart' %}">View Cart </a>
+               </div>
           </div>
      </div>
 </header>
@@ -44,13 +45,11 @@
      <div class="container-fluid">
           <div class="row gy-4">
                {% for product in products %}
-
-               <div class="col-lg-4">
-                    <!-- <img class="thumbnail" src="{{product.imageURL}}"> -->
-                    <div class="box-element product">
+               <div class="col-lg-4">                    
+                    <div class="box-element product ">
+                         <img class="img-fluid" src="{{product.imageURL}}">
                          <h6><strong>{{product.name}}</strong></h6>
                          <hr>
-                         <h6>{{product.description}}</h6>
 
                          <button data-product="{{product.id}}" data-action="add" class="btn 
                     btn-outline-secondary add-btn update-cart">Add to Cart</button>

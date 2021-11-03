@@ -1,13 +1,66 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.contrib import messages
 
-from ewallet.models import Parent, Student, Transaction
+from ewallet.models import Parent, Student, Transaction, Product
 from ewallet.decorators import allowed_users
-from .models import Product
 from .forms import ProductForm, StudentForm
 from .filters import TransactionFilter, StudentFilter, ProductFilter
 
+def registerPage(request):
+    # create_superuser(username, email=None, password=None, **extra_fields)
 
-@allowed_users(allowed_roles=['admin'])
+    # form = CreateUserForm()
+    # if request.method == 'POST':
+    #     # create a form instance and populate it with data from the request:
+    #     form = CreateUserForm(request.POST)
+    #     # check whether it's valid:
+    #     if form.is_valid():
+    #         user = form.save()
+    #         username = form.cleaned_data.get('username')            
+
+    #         group = Group.objects.get_or_create(name='parent')           
+    #         group.user_set.add(user)
+
+    #         Parent.objects.create(
+    #             user=user,
+    #             name=user.username,
+    #         )
+    #         ParentWallet.objects.create(
+    #             parent=user.parent,
+    #         )
+
+    #         messages.success(
+    #             request, 'Your account was created succesfully, ' + username)
+            # return redirect('/login/')
+
+    context = {
+        # 'form': form
+        }
+    return render(request, "ewallet/register.html", context)
+
+
+# @unauthenticated_user
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('/home/')
+        else:
+            messages.info(request, 'Username OR password is incorrect')
+    context = {}
+    return render(request, "ewallet/login.html", context)
+
+# @allowed_users(allowed_roles=['admin'])
 def homepage(request):
     context = {
 

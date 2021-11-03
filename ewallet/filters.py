@@ -10,3 +10,8 @@ class TransactionFilter(django_filters.FilterSet):
     class Meta:
         model = Transaction
         fields = ('transaction_type', 'description' )
+
+class SwalletFilter(django_filters.FilterSet):   
+    class Meta:
+        model = StudentWallet
+        fields = ('student',)

@@ -1,3 +1,4 @@
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
@@ -5,14 +6,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
 
-from .models import ParentWallet, StudentWallet, Student, Parent, Transaction
-from ewalletAdmin.models import Product
-from .forms import StudentForm, CreateUserForm
-from .filters import TransactionFilter
+from .models import (
+    Student,
+    Parent,
+    ParentWallet,
+    StudentWallet,
+    Transaction,
+    Product,
+    Order,
+    OrderItem,
+    ShippingAddress,
+)
+from .forms import StudentForm, CreateUserForm, TransferForm, ReloadForm
+from .filters import TransactionFilter, SwalletFilter
 from .decorators import unauthenticated_user
+import datetime
+import json
 
 # @unauthenticated_user
 
+def frontPage(request):
+    context = {}
+    return render(request, "ewallet/frontdoor.html", context)
 
 def registerPage(request):
     form = CreateUserForm()
@@ -24,7 +39,8 @@ def registerPage(request):
             user = form.save()
             username = form.cleaned_data.get('username')
 
-            group = Group.objects.get_or_create(name='parent')
+            group, created = Group.objects.get_or_create(name='parent')
+            print("Group id: " + str(group))
             user.groups.add(group)
 
             Parent.objects.create(
@@ -68,13 +84,16 @@ def logoutUser(request):
 @login_required(login_url='/login/')
 def homepage(request):
     user = request.user
+
+    if not user.groups.filter(name="parent"):
+        print("User " + user.username + " is NOT in a group parent")
+        messages.info(request, 'You need to login with a non-admin account')
+        logout(request)
+        return redirect('/login/')
+
     pw = user.parent.parentwallet.balance
     sw = user.parent.studentwallet_set.all()
-    transactions = Transaction.objects.all()
-
-    # print('The user name is '+ user.parent.name)
-    # print('Parent wallet: '+ pw.parent.name)
-    # print('Student wallet: '+ s_wallet.explain())
+    transactions = user.parent.transaction_set.all()
 
     context = {
         'pw': pw,
@@ -87,21 +106,11 @@ def homepage(request):
 @login_required(login_url='/login/')
 def wallet_page(request):
     user = request.user
+
     pwb = user.parent.parentwallet.balance
     sw = user.parent.studentwallet_set.all()
 
-    if request.method == 'POST':
-        num = request.POST['amount']
-        id = request.POST['studentID']
-        if num != 0 and pwb != 0:
-            student = Student.objects.filter(
-                student_id=id)
-            a = pwb - float(num)
-            b = student.studentwallet.balance + float(num)            
-            return redirect('/wallet/')
-
-        else:
-            messages.info(request, 'Not enough money to transfer')
+    # transaction = Transaction.objects.get_or_create(transaction_id=1, transaction_type='Deposit')
 
     context = {
         'pwb': pwb,
@@ -112,14 +121,70 @@ def wallet_page(request):
     return render(request, "ewallet/wallet.html", context)
 
 
-# @login_required(login_url='/login/')
-# def topup_page(request):
-#     return render(request, "ewallet/topup.html", {})
+@login_required(login_url='/login/')
+def topup_page(request):
 
+    if request.method == 'POST':
+
+        # Pass the form data to the form class
+        details = TransferForm(request.POST)
+
+        # In the 'form' class the clean function
+        # is defined, if all the data is correct
+        # as per the clean function, it returns true
+        if details.is_valid():
+
+            # Temporarily make an object to be add some
+            # logic into the data if there is such a need
+            # before writing to the database
+            post = details.save(commit=False)
+
+            # Finally write the changes into database
+            post.save()
+            return HttpResponse("data submitted successfully")
+
+        else:
+            return HttpResponse("data invalid")
+        # return redirect('/topup/')
+    else:
+
+        # If the request is a GET request then,
+        # create an empty form object and
+        # render it into the page
+        form = TransferForm(None)
+        context = {'form': form}
+        return render(request, "ewallet/topup.html", context)
 
 @login_required(login_url='/login/')
-def py(request):
-    transactions = Transaction.objects.all()
+def reload(request):
+    sw = request.user.parent.studentwallet_set.all()
+
+    myOption = SwalletFilter(request.GET, queryset=sw)
+    sw = myOption.qs
+
+    if request.method == 'POST':        
+        details = ReloadForm(request.POST)
+        
+        if details.is_valid():            
+            post = details.save(commit=False)            
+            post.save()
+            return HttpResponse("data submitted successfully")
+
+        else:
+            return HttpResponse("data invalid")
+       
+    else:        
+        form = ReloadForm(None)
+        context = {
+            'form': form,
+            'myOption': myOption,
+            'sw': sw,
+        }
+        return render(request, "ewallet/reload.html", context)
+
+@login_required(login_url='/login/')
+def transaction_history(request):
+    transactions = request.user.parent.transaction_set.all()
 
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
@@ -155,9 +220,158 @@ def add_dependent(request):
 
 @login_required(login_url='/login/')
 def store(request):
-    products = Product.objects.all()
+    parent = request.user.parent
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
 
+    products = Product.objects.all()
     context = {
         'products': products,
+        'cartItems': cartItems
     }
     return render(request, "ewallet/store.html", context)
+
+
+@login_required(login_url='/login/')
+def cart(request):
+    parent = request.user.parent
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
+
+    context = {
+        'items': items,
+        'order': order,
+        'cartItems': cartItems
+    }
+    return render(request, 'ewallet/cart.html', context)
+
+
+@login_required(login_url='/login/')
+def checkout(request):
+    parent = request.user.parent
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
+
+    context = {
+        'items': items,
+        'order': order,
+        'cartItems': cartItems
+    }
+    return render(request, 'ewallet/checkout.html', context)
+
+
+@login_required(login_url='/login/')
+def updateItem(request):
+    data = json.loads(request.body)
+    productId = data['productId']
+    action = data['action']
+
+    print('Action:', action)
+    print('productId:', productId)
+
+    parent = request.user.parent
+    product = Product.objects.get(id=productId)
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+
+    orderItem, created = OrderItem.objects.get_or_create(
+        order=order, product=product)
+
+    if action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+    elif action == 'remove':
+        orderItem.quantity = (orderItem.quantity - 1)
+
+    orderItem.save()
+
+    if orderItem.quantity <= 0:
+        orderItem.delete()
+
+    return JsonResponse('Item was added', safe=False)
+
+
+@login_required(login_url='/login/')
+def processOrder(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    parent = request.user.parent
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+    total = float(data['form']['total'])
+    order.transaction_id = transaction_id
+
+    if total == order.get_cart_total:
+        order.complete = True
+    order.save()
+
+    ShippingAddress.objects.create(
+        parent=parent,
+        order=order,
+        address=data['shipping']['address'],
+        city=data['shipping']['city'],
+        state=data['shipping']['state'],
+        zipcode=data['shipping']['zipcode'],
+
+    )
+    return JsonResponse('Payment Complete', safe=False)
+
+
+@login_required(login_url='/login/')
+def processTransaction(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    parent = request.user.parent
+    p_wallet = parent.parentwallet
+    p_wallet.balance += float(data['form']['amount'])
+    p_wallet.save()
+
+    # if total == transaction.get_cart_total:
+    #     transaction.complete = True
+    # transaction.save()
+
+    Transaction.objects.create(
+        parent=parent,
+        transaction_id=transaction_id,
+        timestamp=datetime.datetime.now(),
+        transaction_type='Deposit',
+        description='Online',
+        amount=data['form']['amount'],
+    )
+    return JsonResponse('Payment Complete', safe=False)
+
+@login_required(login_url='/login/')
+def processReload(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    parent = request.user.parent
+    p_wallet = parent.parentwallet
+    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])    
+    
+    if p_wallet.balance > 0:
+        p_wallet.balance -= float(data['form']['amount'])
+        p_wallet.save()
+        s_wallet.balance += float(data['form']['amount'])
+        s_wallet.save()  
+
+        Transaction.objects.create(
+            parent=parent,
+            s_wallet= s_wallet,
+            transaction_id=transaction_id,
+            timestamp=datetime.datetime.now(),
+            transaction_type='Transfer',
+            description='Reload',
+            amount=data['form']['amount'],
+        )
+        return JsonResponse('Payment Complete', safe=False)
+    
+    else:
+        return JsonResponse('Not enough balance', safe=False)

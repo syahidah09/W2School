@@ -1,0 +1,95 @@
+{% extends 'ewallet/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Reload</title>
+{% endblock %}
+
+{% block content2 %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 align-items-center">
+                <a class="me-3" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <h2 class="me-auto my-0">Reload</h2>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="pb-0 pt-3 mb-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <p class="mb-0">How much do you want to reload?</p>
+            <form id="form" class="form-horizontal" method="POST" action="">
+                {% csrf_token %}               
+                <div class="col-sm-4" id="reload-info">                    
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" for="id_s_wallet">Student</span>
+                        {{form.s_wallet}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">RM</span>
+                        {{form.amount}}
+                    </div>
+                </div>
+                <a class="btn btn-secondary" type="button" href="{% url 'ewallet:wallet' %}">Cancel</a>
+                <button class="btn btn-primary" type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form Submitted...')        
+        console.log('Continue button clicked')
+        console.log('Student: ', form.s_wallet.value)
+        console.log('Amount: ', form.amount.value)
+        submitFormData()
+    })   
+
+    function submitFormData() {
+        console.log('Payment btn clicked')
+
+        var reloadFormData = {
+            's_wallet': null,
+            'amount': null,
+        }
+
+        reloadFormData.s_wallet = form.s_wallet.value
+        reloadFormData.amount = form.amount.value
+
+        // console.log('Shipping Info:', shippingInfo)
+        // console.log('User Info:', userFormData)
+
+        var url = "/process_reload/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': reloadFormData })
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewallet:wallet' %}"
+            })
+    }
+
+</script>
+
+<script type="text/javascript">
+    document.getElementById('id_s_wallet').classList.add("form-select");
+    document.getElementById('id_amount').classList.add("form-control");
+</script>
+{% endblock %}

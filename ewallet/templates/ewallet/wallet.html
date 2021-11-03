@@ -10,52 +10,40 @@
 <header class="bg-white shadow-sm px-4 py-3 z-index-20">
     <div class="container-fluid px-0">
         <div class="row gy-4">
-            <div class="col-lg-3">
-                <h2 class="mb-0 p-1">Wallets</h2>
-            </div>
-            <div class="col-lg-4 offset-md-5">
-                <button class="btn btn-sm btn-info d-inline" type="button" data-bs-toggle="modal"
+            <div class="d-flex mb-0 align-items-center">
+                <h2 class="me-auto  my-0">Wallets</h2>
+                <!-- <button class="btn w3-theme-d4 rounded-pill me-2" type="button" data-bs-toggle="modal" data-bs-target="#myModal"> Top Up </button> -->
+                <a class="btn w3-theme-d4 rounded-pill me-2" type="button" href="{% url 'ewallet:topup' %}">
+                    Top Up</a>
+                <!-- <button class="btn w3-theme-d4 rounded-pill me-2" type="button" data-bs-toggle="modal"
                     data-bs-target="#myModal">Reload
-                    Child</button>
-                <a class="btn btn-sm btn-info d-inline" href="{% url 'ewallet:add_dependent' %}">Add New Dependent</a>
+                    Child</button> -->
+                <a class="btn w3-theme-d4 rounded-pill me-2" type="button" href="{% url 'ewallet:reload' %}">
+                    Reload</a>
+                <a class="btn w3-theme-d4 rounded-pill" type="button" href="{% url 'ewallet:add_dependent' %}">Add New
+                    Dependent</a>
             </div>
         </div>
     </div>
 </header>
 
 <!-- Section-->
-<section class="pb-0 pt-3">
+<section class="pb-0 pt-3 mb-3">
     <div class="container-fluid">
-        <div class="row gy-4">
-
-            <!-- Parent wallet (myWallet)-->
-            <div class="col-lg-4">
-                <div class="card bg-light mb-1 border-primary">
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <div class="col">
+                <div class="card bg-light mb-1 border-primary text-center rounded">
                     <div class="card-header">
                         <h3 class="h4 mb-0">My Wallet</h3>
                     </div>
                     <div class="card-body">
                         <p>RM {{ pwb|floatformat:2 }}</p>
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#collapseTopUp" aria-expanded="false" aria-controls="collapseTopUp">
-                            Top Up
-                        </button>
-                        <div class="row justify-content-center">
-                            <div class="collapse" id="collapseTopUp">
-                                <div class="col-auto mt-4" id="payment-info">
-                                    <div id="paypal-button-container"></div>
-                                    <script src="https://www.paypal.com/sdk/js?client-id=test"></script>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Students wallet -->
             {% for s_wallet in sw %}
-            <div class="col-lg-4">
-                <div class="card bg-light mb-1 border-primary">
+            <div class="col">
+                <div class="card bg-light mb-1 border-primary text-center rounded">
                     <div class="card-header">
                         <h3 class="h4 mb-0">{{ s_wallet.student.name }}</h3>
                     </div>
@@ -65,6 +53,7 @@
                 </div>
             </div>
             {% endfor %}
+
             <!-- Modal-->
             <div class="modal fade text-start" id="myModal" tabindex="-1" aria-labelledby="myModalLabel"
                 aria-hidden="true">
@@ -83,7 +72,7 @@
                                 {% csrf_token %}
                                 <!-- {{ s_wallet.student.student_id }} -->
                                 <div class="col-sm-9">
-                                    <div class="input-group mb-3">
+                                    <!-- <div class="input-group mb-3">
                                         <label class="input-group-text" for="inputGroupSelect01">Student</label>
                                         <select class="form-select" id="inputGroupSelect01">
                                             <option selected>-----------</option>
@@ -92,7 +81,41 @@
                                                 s_wallet.student.name }}</option>
                                             {% endfor %}
                                         </select>
+                                    </div> -->
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">RM</span>
+                                        <input type="number" class="form-control"
+                                            aria-label="Dollar amount (with dot and two decimal places)">
                                     </div>
+                                </div>
+                                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                                <a class="btn btn-primary" type="submit" href="{% url 'ewallet:topup' %}">
+                                    Confirm
+                                </a>
+                                <!-- <button class="btn btn-primary" type="submit"  >Confirm</button> -->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal-->
+            <div class="modal fade text-start" id="myModal" tabindex="-1" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">Topup </h5>
+                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for message in messages %}
+                            <p>{{message}}</p>
+                            {% endfor %}
+                            <p>How much do you want to topup?</p>
+                            <form class="form-horizontal" method="POST" action="">
+                                {% csrf_token %}
+                                <div class="col-sm-9">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">RM</span>
                                         <input type="number" class="form-control"
@@ -110,24 +133,42 @@
         </div>
     </div>
 </section>
+<hr>
 
+<section class="pb-0 pt-3 mb-3">
+    <div class="container-fluid ">
+        <div class="row gy-4">
+            <div class="col-6 " id="payment-info">
+                <div class="card card-body bg-light hidden">
+                    <div id="paypal-button-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script
+    src="https://www.paypal.com/sdk/js?client-id=ATvu8CSqUjeq9VUVDlMKHVlCAhDK03kjG2qfYo5R-agqBKtW6pVilFYb4iMXcYJvF4Em087pHYplvkhg&currency=MYR"></script>
 <script>
+    var total = '12'
     // Render the PayPal button into #paypal-button-container
     paypal.Buttons({
 
         style: {
             color: 'blue',
             shape: 'pill',
-            label: 'pay',
-            height: 40
+            label: 'paypal',
+            height: 35,
+            tagline: false
         },
 
         // Set up the transaction
         createOrder: function (data, actions) {
             return actions.order.create({
+                // This function sets up the details of the transaction, including the amount and line item details.
                 purchase_units: [{
                     amount: {
-                        value: '{{order.get_cart_total}}'
+                        value: parseFloat(total).toFixed(2)
                     }
                 }]
             });
@@ -135,7 +176,11 @@
 
         // Finalize the transaction
         onApprove: function (data, actions) {
+            // This function captures the funds from the transaction.
             return actions.order.capture().then(function (details) {
+                // This function shows a transaction success message to your buyer.
+                alert('Transaction completed by ' + details.payer.name.given_name + ', Email: ' + details.payer.email_address + ', Amount topup: ' + details.purchase_units.amount);
+                // + ', Email: ' + details.payer.email_address + ', Amount topup: ' + details.purchase_units.amount
                 submitFormData()
                 // Show a success message to the buyer
 
@@ -144,6 +189,77 @@
 
 
     }).render('#paypal-button-container');
+</script>
+
+<script type="text/javascript">
+    // var shipping = '{{order.shipping}}'
+
+    // if (shipping == 'False') {
+    //     document.getElementById('shipping-info').innerHTML = ''
+    // }
+
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form Submitted...')
+        document.getElementById('form-button').classList.add("hidden");
+        document.getElementById('payment-info').classList.remove("hidden");
+    })
+
+    /*
+    document.getElementById('make-payment').addEventListener('click', function(e){
+        submitFormData()
+    })
+    */
+
+    function submitFormData() {
+        console.log('Payment button clicked')
+
+        var userFormData = {
+            'name': null,
+            'email': null,
+            'total': total,
+        }
+
+        var shippingInfo = {
+            'address': null,
+            'city': null,
+            'state': null,
+            'zipcode': null,
+        }
+
+        if (shipping != 'False') {
+            shippingInfo.address = form.address.value
+            shippingInfo.city = form.city.value
+            shippingInfo.state = form.state.value
+            shippingInfo.zipcode = form.zipcode.value
+        }
+
+        console.log('Shipping Info:', shippingInfo)
+        console.log('User Info:', userFormData)
+
+        var url = "/process_order/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'applicaiton/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo }),
+
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data);
+                alert('Transaction completed');
+
+                cart = {}
+                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+                window.location.href = "{% url 'ewallet:wallet' %}"
+
+            })
+    }
 </script>
 
 {% endblock %}
