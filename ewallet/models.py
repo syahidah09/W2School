@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -24,10 +25,22 @@ class Student(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-    )
+    )   
+
+    def get_absolute_url(self):
+        return reverse('ewalletAdmin:student-detail', args=[str(self.student_id)])
+
+    def get_update(self):
+        return reverse('ewalletAdmin:student-update', args=[str(self.student_id)])
+
+    def confirm_delete(self):
+        return reverse('ewalletAdmin:student-delete', args=[str(self.student_id)])
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['student_id']
 
 
 class ParentWallet(models.Model):

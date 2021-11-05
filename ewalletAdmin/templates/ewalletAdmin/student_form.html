@@ -11,8 +11,8 @@
 <header class="bg-white shadow-sm px-4 py-3 z-index-20">
     <div class="container-fluid px-0">
         <div class="row gy-4">
-            <div class="col-lg-10">
-                <h2 class="mb-0 p-1">Add New Student</h2>
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Add New Student</h2>
             </div>
         </div>
     </div>
@@ -22,11 +22,11 @@
 
     <form class="form-horizontal" method="POST" action="">
         {% csrf_token %}
-        {% for field in student_form %}
+        {% for field in form %}
 
         <div class="row gy-2 mb-4">
-            <div class="col-sm-2 form-label">
-                {{ field.label_tag }}
+            <div class="col-sm-2">
+                <strong>{{ field.label_tag }}</strong>
             </div>
             <div class="col-sm-8">
                 {{ field }}
@@ -37,10 +37,20 @@
         <div class="row">
             <div class="col-sm-10 ms-auto">
                 <input class="btn btn-primary" type="submit" value="Submit">
+                <a class="btn btn-secondary" type="button" href="{% url 'ewalletAdmin:students' %}">Cancel</a>                
               </div>
         </div>
 
     </form>
 </div>
+
+<script type="text/javascript">
+    document.getElementById('id_student_id').classList.add("form-control");
+    document.getElementById('id_name').classList.add("form-control");
+    document.getElementById('id_classgroup').classList.add("form-control");
+    document.getElementById('id_batch').classList.add("form-control");
+    document.getElementById('id_card_id').classList.add("form-control");
+    document.getElementById('id_parent').classList.add("form-select");
+</script>
 
 {% endblock %}

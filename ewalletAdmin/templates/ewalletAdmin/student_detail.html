@@ -1,0 +1,50 @@
+{% extends 'ewalletAdmin/base.html' %}
+{% load static %}
+
+{% block another_content %}
+<title>Student Detail</title>
+{% endblock %}
+
+{% block content2 %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Student Detail</h2>
+                <!-- <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewalletAdmin:student-create' %}">Add New Student</a> -->
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <div class="col-lg-2 form-label">
+
+                <p><strong>Name:</strong></p>
+                <p><strong>ID:</strong> </p>
+                <p><strong>Classgroup:</strong> </p>
+                <p><strong>Batch:</strong> </p>
+                <p><strong>Card ID:</strong> </p>
+                <p><strong>Parent:</strong> </p>
+            </div>
+            <div class="col-lg-3">
+                <p>{{ student.name }}</p>
+                <p><a href="{{ student.student_id.get_absolute_url }}">{{ student.student_id }}</a>
+                </p>
+                <p>{{ student.classgroup }}</p>
+                <p>{{ student.batch }}</p>
+                <p>{{ student.card_id }}</p>
+                <p>{{ student.parent.name }}</p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}
