@@ -15,6 +15,11 @@ urlpatterns = [
     # path('create_student/', views.createStudent, name='create_student'),
     # path('update_student/<int:pk>/', views.updateStudent, name='update_student'),
 
+    path('parents/', views.ParentListView.as_view(), name='parents'),
+    path('parent/<int:pk>', views.ParentDetailView.as_view(), name='parent-detail'),
+    path('parent/<int:pk>/update', views.ParentUpdateView.as_view(), name='parent-update'),
+    path('parent/<int:pk>/delete', views.ParentDeleteView.as_view(), name='parent-delete'),
+
     path('products/', views.productPage, name='products'),
     path('create_product/', views.createProduct, name='create_product'),
     path('update_product/<int:pk>/', views.updateProduct, name='update_product'),

@@ -10,8 +10,21 @@ class Parent(models.Model):
     phone = models.CharField(max_length=200, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('ewalletAdmin:parent-detail', args=[str(self.id)])
+
+    def get_update(self):
+        return reverse('ewalletAdmin:parent-update', args=[str(self.id)])
+
+    def confirm_delete(self):
+        return reverse('ewalletAdmin:parent-delete', args=[str(self.id)])
+
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['name']
+
 
 
 class Student(models.Model):

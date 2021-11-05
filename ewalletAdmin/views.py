@@ -73,36 +73,42 @@ def homepage(request):
     return render(request, "ewalletAdmin/home.html", context)
 
 # Student Model Views
-class StudentCreateView(CreateView):    
-    model = Student     
+
+
+class StudentCreateView(CreateView):
+    model = Student
     fields = '__all__'
     template_name = 'ewalletAdmin/student_form.html'
-    success_url ="/admin2/students/"
+    success_url = "/admin2/students/"
+
 
 class StudentListView(ListView):
     model = Student
-    template_name = 'ewalletAdmin/student_list.html' 
+    template_name = 'ewalletAdmin/student_list.html'
     paginate_by = 5
     # context_object_name = 'classgroup'
 
     # def get_queryset(self):
     #     return Student.objects.filter(classgroup='5 Sina')
 
+
 class StudentDetailView(DetailView):
     model = Student
-    template_name = 'ewalletAdmin/student_detail.html' 
+    template_name = 'ewalletAdmin/student_detail.html'
 
-class StudentUpdateView(UpdateView):    
-    model = Student     
+
+class StudentUpdateView(UpdateView):
+    model = Student
     fields = '__all__'
     template_name = 'ewalletAdmin/student_form.html'
-    success_url ="/admin2/students/"
+    success_url = "/admin2/students/"
 
-class StudentDeleteView(DeleteView):    
-    model = Student     
+
+class StudentDeleteView(DeleteView):
+    model = Student
     fields = '__all__'
     template_name = 'ewalletAdmin/student_confirm_delete.html'
-    success_url ="/admin2/students/"
+    success_url = "/admin2/students/"
 
 
 def manageStudent(request):
@@ -155,8 +161,48 @@ def updateStudent(request, pk):
     return render(request, "ewalletAdmin/student_form.html", context)
 
 # Parent Model Views
+# class ParentCreateView(CreateView):
+#     model = Parent
+#     fields = '__all__'
+#     template_name = 'ewalletAdmin/parent_form.html'
+#     success_url ="/admin2/parents/"
+
+
+class ParentListView(ListView):
+    model = Parent
+    template_name = 'ewalletAdmin/parent_list.html'
+    paginate_by = 5
+    # context_object_name = 'classgroup'
+
+    # def get_queryset(self):
+    #     return Student.objects.filter(classgroup='5 Sina')
+
+
+class ParentDetailView(DetailView):
+    model = Parent
+    template_name = 'ewalletAdmin/parent_detail.html'
+
+
+class ParentUpdateView(UpdateView):
+    model = Parent
+    fields = [
+        'name',
+        'phone',
+        'email'
+    ]
+    template_name = 'ewalletAdmin/parent_form.html'
+    success_url = "/admin2/parents/"
+
+
+class ParentDeleteView(DeleteView):
+    model = Parent
+    fields = '__all__'
+    template_name = 'ewalletAdmin/parent_confirm_delete.html'
+    success_url = "/admin2/parents/"
 
 # Product Model Views
+
+
 def productPage(request):
     products = Product.objects.all()
 
@@ -218,6 +264,8 @@ def deleteProduct(request, pk):
     return render(request, "ewalletAdmin/delete.html", context)
 
 # Transaction Model Views
+
+
 def transactions(request):
     transactions = Transaction.objects.all()
 
