@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block another_content %}
-<title>Student List</title>
+<title>Transaction List</title>
 {% endblock %}
 
 {% block content2 %}
@@ -11,9 +11,9 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 justify-content-between align-items-center">
-                <h2 class="my-0">Student List</h2>
+                <h2 class="my-0">Transaction List</h2>
                 <a class="btn w3-theme-d4 rounded-pill " type="button"
-                    href="{% url 'ewalletAdmin:student-create' %}">Add New Student</a>
+                    href="{% url 'ewalletAdmin:transaction-create' %}">Add New Transaction</a>
             </div>
         </div>
     </div>
@@ -22,41 +22,42 @@
 <!-- Section-->
 <section class="pb-0 pt-3">
     <div class="container-fluid">
-        <!-- Student Table -->
+        <!-- Transaction Table -->
         <div class="row gy-4">
             <div class="col-lg-12">
                 <div class="card mb-0">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-bordered mb-0 align-middle" style="text-align: center">
+                            <table class="table mb-0 align-middle" style="text-align: center">
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%;"></th>
-                                        <th>Student ID</th>
-                                        <th>Name</th>
-                                        <th>Class</th>                                        
+                                        <th>Transaction ID</th>
+                                        <th>Transaction Type</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                {% if student_list %}
-                                {% for student in student_list %}
+                                {% if transaction_list %}
+                                {% for transaction in transaction_list %}
                                 <tbody>
-                                    <tr>
-                                        <td><a class="btn btn-sm btn-secondary"
-                                            href="{{ student.get_absolute_url }}">View</a></td>
-                                        <td>{{ student.student_id }}</td>
-                                        <td>{{ student.name }}</td>
-                                        <td>{{ student.classgroup }}</td>                                        
-                                        <td>                                            
-                                            <a class="btn btn-sm btn-info" href="{{ student.get_update }}">Update</a>
+                                    <tr>                                       
+                                        <td><a href="{{ transaction.get_absolute_url }}">{{ transaction.transaction_id }}</a></td>
+                                        <td>{{ transaction.transaction_type }}</td>
+                                        <td>{{ transaction.description }}</td>
+                                        <td>{{ transaction.amount|floatformat:2 }}</td>
+                                        <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                                        <td><a class="btn btn-sm btn-info"
+                                                href="{{ transaction.get_update }}">Update</a>
                                             <a class="btn btn-sm btn-danger"
-                                                href="{{ student.confirm_delete }}">Delete</a>
+                                                href="{{ transaction.confirm_delete }}">Delete</a>
                                         </td>
                                     </tr>
                                 </tbody>
                                 {% endfor %}
                                 {% else %}
-                                <p>There are no students in the record.</p>
+                                <p>There are no transaction in the record.</p>
                                 {% endif %}
                             </table>
                         </div>

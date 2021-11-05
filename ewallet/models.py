@@ -110,6 +110,7 @@ class Transaction(models.Model):
         ('e-Store', 'e-Store'),
         ('School Fee', 'School Fee'),
     ]
+    transaction_id = models.CharField(max_length=100, null=True)
     parent = models.ForeignKey(
         Parent, null=True, blank=True, on_delete=models.SET_NULL)
     p_wallet = models.ForeignKey(
@@ -117,12 +118,20 @@ class Transaction(models.Model):
     s_wallet = models.ForeignKey(
         StudentWallet, null=True, blank=True, on_delete=models.SET_NULL)
     timestamp = models.DateTimeField(auto_now_add=True)
-    amount = models.FloatField(default=0)
-    transaction_id = models.CharField(max_length=100, null=True)
+    amount = models.FloatField(default=0)    
     transaction_type = models.CharField(
         max_length=15, choices=TRANSACTION_TYPES, default='Payment')
     description = models.CharField(
         max_length=15, choices=DESCRIPTION, default='Online')
+
+    def get_absolute_url(self):
+        return reverse('ewalletAdmin:transaction-detail', args=[str(self.id)])
+
+    def get_update(self):
+        return reverse('ewalletAdmin:transaction-update', args=[str(self.id)])
+
+    def confirm_delete(self):
+        return reverse('ewalletAdmin:transaction-delete', args=[str(self.id)])
 
     def __str__(self):
         return str(self.id)

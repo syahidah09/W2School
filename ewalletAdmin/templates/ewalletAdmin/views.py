@@ -67,14 +67,8 @@ def loginPage(request):
 
 
 def homepage(request):
-    transactions = Transaction.objects.all()[:5]
-    students = Student.objects.all()
-    parents = Parent.objects.all()
-
     context = {
-        'transactions': transactions,
-        'students': students,
-        'parents': parents,
+
     }
     return render(request, "ewalletAdmin/home.html", context)
 
@@ -270,14 +264,7 @@ def deleteProduct(request, pk):
 # Transaction Model Views
 class TransactionCreateView(CreateView):
     model = Transaction
-    fields = [
-        'transaction_id',
-        'transaction_type',
-        'description',
-        's_wallet',
-        'amount'
-    ]
-    
+    fields = '__all__' 
     template_name = 'ewalletAdmin/transaction_form.html'
     success_url = "/admin2/transactions/"
 
@@ -285,7 +272,7 @@ class TransactionCreateView(CreateView):
 class TransactionListView(ListView):
     model = Transaction
     template_name = 'ewalletAdmin/transaction_list.html'
-    paginate_by = 10
+    paginate_by = 5
     # context_object_name = 'classgroup'
 
     # def get_queryset(self):
@@ -299,26 +286,14 @@ class TransactionDetailView(DetailView):
 
 class TransactionUpdateView(UpdateView):
     model = Transaction
-    fields = [
-        'transaction_id',
-        'transaction_type',
-        'description',
-        's_wallet',
-        'amount'
-    ]
+    fields = '__all__'
     template_name = 'ewalletAdmin/transaction_form.html'
     success_url = "/admin2/transactions/"
 
 
 class TransactionDeleteView(DeleteView):
     model = Transaction
-    fields = [
-        'transaction_id',
-        'transaction_type',
-        'description',
-        's_wallet',
-        'amount'
-    ]
+    fields = '__all__'
     template_name = 'ewalletAdmin/transaction_confirm_delete.html'
     success_url = "/admin2/transactions/"
 

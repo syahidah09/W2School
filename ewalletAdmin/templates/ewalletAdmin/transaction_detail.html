@@ -1,0 +1,47 @@
+{% extends 'ewalletAdmin/base.html' %}
+{% load static %}
+
+{% block another_content %}
+<title>Transaction Detail</title>
+{% endblock %}
+
+{% block content2 %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Transaction Detail</h2>
+                <!-- <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewalletAdmin:student-create' %}">Add New Student</a> -->
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <div class="col-lg-2 form-label">
+
+                <th><strong>Transaction ID</strong></th>
+                <th><strong>Transaction Type</strong> </th>
+                <th><strong>Description</strong> </th>
+                <th><strong>Amount</strong> </th>
+                <th><strong>Date</strong> </th>
+            </div>
+            <div class="col-lg-3">
+                <td><a href="{{ transaction.get_absolute_url }}">{{ transaction.transaction_id }}</a></td>
+                <td>{{ transaction.transaction_type }}</td>
+                <td>{{ transaction.description }}</td>
+                <td>{{ transaction.amount|floatformat:2 }}</td>
+                <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}

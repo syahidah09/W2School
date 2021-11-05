@@ -5,7 +5,7 @@ app_name = 'ewalletAdmin'
 urlpatterns = [   
     path('', views.homepage, name='home'),
 
-    path('students/create', views.StudentCreateView.as_view(), name='student-create'),
+    path('student/create', views.StudentCreateView.as_view(), name='student-create'),
     path('students/', views.StudentListView.as_view(), name='students'),
     path('student/<int:pk>', views.StudentDetailView.as_view(), name='student-detail'),
     path('student/<int:pk>/update', views.StudentUpdateView.as_view(), name='student-update'),
@@ -25,7 +25,10 @@ urlpatterns = [
     path('update_product/<int:pk>/', views.updateProduct, name='update_product'),
     path('delete_product/<int:pk>/', views.deleteProduct, name='delete_product'),
 
-    path('transactions/', views.transactions, name='transactions'), 
-
+    path('transaction/create', views.TransactionCreateView.as_view(), name='transaction-create'),
+    path('transactions/', views.TransactionListView.as_view(), name='transactions'),
+    path('transaction/<int:pk>', views.TransactionDetailView.as_view(), name='transaction-detail'),
+    path('transaction/<int:pk>/update', views.TransactionUpdateView.as_view(), name='transaction-update'),
+    path('transaction/<int:pk>/delete', views.TransactionDeleteView.as_view(), name='transaction-delete'),
     
 ]
