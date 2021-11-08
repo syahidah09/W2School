@@ -19,13 +19,27 @@
     </div>
 </header>
 
+{% for message in messages %}
+<div class="toast hide top-0 start-50 translate-middle-x" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <!-- <img src="..." class="rounded me-2" alt="..."> -->
+        <!-- <strong class="me-auto">Bootstrap</strong> -->
+        <!-- <small>11 mins ago</small> -->
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        <p>{{message}}</p>
+    </div>
+</div>
+{% endfor %}
+
 <section class="pb-0 pt-3 mb-3">
     <div class="container-fluid">
         <div class="row gy-4">
             <p class="mb-0">How much do you want to reload?</p>
             <form id="form" class="form-horizontal" method="POST" action="">
-                {% csrf_token %}               
-                <div class="col-sm-4" id="reload-info">                    
+                {% csrf_token %}
+                <div class="col-sm-4" id="reload-info">
                     <div class="input-group mb-3">
                         <span class="input-group-text" for="id_s_wallet">Student</span>
                         {{form.s_wallet}}
@@ -46,12 +60,22 @@
     var form = document.getElementById('form')
     form.addEventListener('submit', function (e) {
         e.preventDefault()
-        console.log('Form Submitted...')        
+        console.log('Form Submitted...')
         console.log('Continue button clicked')
         console.log('Student: ', form.s_wallet.value)
         console.log('Amount: ', form.amount.value)
-        submitFormData()
-    })   
+
+        var reloadamount = form.amount.value
+        var pw = '{{ pw.balance }}'        
+        if (reloadamount > parseInt(pw)) { 
+            console.log('Reload amount is bigger than wallet balance')
+            alert('Not enough balance. Please topup.');
+            window.location.href = "{% url 'ewallet:wallet' %}"
+        } else {            
+            submitFormData()
+        }
+            
+    })
 
     function submitFormData() {
         console.log('Payment btn clicked')

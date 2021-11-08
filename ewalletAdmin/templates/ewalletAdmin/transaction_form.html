@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block another_content %}
-<title>Add New Transaction</title>
+<title>Add/Update Transaction</title>
 {% endblock %}
 
 {% block content2 %}
@@ -12,7 +12,7 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 justify-content-between align-items-center">
-                <h2 class="my-0">Add New Transaction</h2>
+                <h2 class="my-0">Add/Update Transaction</h2>
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@
 
 <div class="col-lg-12 p-4">
 
-    <form class="form-horizontal" method="POST" action="">
+    <form id="form" class="form-horizontal" method="POST" action="">
         {% csrf_token %}
         {% for field in form %}
 
@@ -45,8 +45,58 @@
 </div>
 
 <script type="text/javascript">
-    document.getElementById('id_transaction_type').classList.add("form-select");
-    document.getElementById('id_description').classList.add("form-select");
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form Submitted...')
+        console.log('Continue button clicked')        
+        console.log('Student: ', form.s_wallet.value)
+        console.log('Amount: ', form.amount.value)
+
+        // var reloadamount = form.amount.value
+        // var pw = '{{ pw.balance }}'        
+        // if (reloadamount > parseInt(pw)) { 
+        //     console.log('Reload amount is bigger than wallet balance')
+        //     alert('Not enough balance. Please topup.');
+        //     window.location.href = "{% url 'ewallet:wallet' %}"
+        // } else {            
+        //     submitFormData()
+        // }
+
+        submitFormData()
+            
+    })
+
+    function submitFormData() {
+        console.log('Payment btn clicked')
+
+        var transFormData = {            
+            's_wallet': form.s_wallet.value,
+            'amount': form.amount.value,
+        }
+        
+        var url = "/admin2/process_transaction2/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': transFormData })
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewalletAdmin:transactions' %}"
+            })
+    }
+
+</script>
+
+<script type="text/javascript">    
     document.getElementById('id_amount').classList.add("form-control");
     document.getElementById('id_s_wallet').classList.add("form-control");   
 </script>

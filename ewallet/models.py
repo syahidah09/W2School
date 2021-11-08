@@ -82,6 +82,15 @@ class Product(models.Model):
     quantity = models.IntegerField(default=0, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('ewalletAdmin:product-detail', args=[str(self.id)])
+
+    def get_update(self):
+        return reverse('ewalletAdmin:product-update', args=[str(self.id)])
+
+    def confirm_delete(self):
+        return reverse('ewalletAdmin:product-delete', args=[str(self.id)])
+
     def __str__(self):
         return self.name
 
@@ -92,6 +101,9 @@ class Product(models.Model):
         except:
             url = '/static/img/placeholder.png'
         return url
+    
+    class Meta:
+        ordering = ['name']
 
 
 class Transaction(models.Model):

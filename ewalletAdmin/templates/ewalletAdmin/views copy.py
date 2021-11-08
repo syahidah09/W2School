@@ -9,10 +9,11 @@ from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
+
 from ewallet.models import *
 from ewallet.decorators import allowed_users
-from .forms import *
-from .filters import *
+from .forms import ProductForm, StudentForm
+from .filters import TransactionFilter, StudentFilter, ProductFilter
 
 
 def registerPage(request):
@@ -208,40 +209,7 @@ class ParentDeleteView(DeleteView):
     success_url = "/admin2/parents/"
 
 # Product Model Views
-class ProductCreateView(CreateView):
-    model = Product
-    fields = '__all__'
-    template_name = 'ewalletAdmin/product_form.html'
-    success_url = "/admin2/products/"
 
-
-class ProductListView(ListView):
-    model = Product
-    template_name = 'ewalletAdmin/product_list.html'
-    paginate_by = 10
-    # context_object_name = 'classgroup'
-
-    # def get_queryset(self):
-    #     return Student.objects.filter(classgroup='5 Sina')
-
-
-class ProductDetailView(DetailView):
-    model = Product
-    template_name = 'ewalletAdmin/product_detail.html'
-
-
-class ProductUpdateView(UpdateView):
-    model = Product
-    fields = '__all__'
-    template_name = 'ewalletAdmin/product_form.html'
-    success_url = "/admin2/products/"
-
-
-class ProductDeleteView(DeleteView):
-    model = Product
-    fields = '__all__'
-    template_name = 'ewalletAdmin/product_confirm_delete.html'
-    success_url = "/admin2/products/"
 
 def productPage(request):
     products = Product.objects.all()
@@ -320,7 +288,9 @@ class TransactionCreateView(CreateView):
 def processTransaction(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
-    
+
+    parent = request.user.parent
+    p_wallet = parent.parentwallet
     s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
 
     if (s_wallet.balance > float(data['form']['amount'])):

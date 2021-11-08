@@ -1,0 +1,45 @@
+{% extends 'ewalletAdmin/base.html' %}
+{% load static %}
+
+{% block another_content %}
+<title>Product Detail</title>
+{% endblock %}
+
+{% block content2 %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Product Detail</h2>
+                
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <div class="col-lg-2 form-label">
+
+                <p><strong>Name:</strong></p>
+                <p><strong>Price:</strong> </p>
+                <p><strong>Quantity:</strong> </p>
+                
+            </div>
+            <div class="col-lg-3">                
+                <p><a href="{{ product.id.get_absolute_url }}">{{ product.name }}</a>
+                </p>
+                <p>{{ product.price|floatformat:2 }}</p>
+                <p>{{ product.quantity }}</p>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}

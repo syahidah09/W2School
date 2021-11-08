@@ -1,0 +1,107 @@
+{% extends 'ewalletAdmin/base.html' %}
+{% load static %}
+
+{% block another_content %}
+<title>Product List</title>
+{% endblock %}
+
+{% block content2 %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Product List</h2>
+                <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewalletAdmin:product-create' %}">Add Product</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <!-- Parent Table -->
+        <div class="row gy-4">
+            <div class="col-lg-12">
+                <div class="card mb-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0 align-middle" style="text-align: center">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                {% if product_list %}
+                                {% for product in product_list %}
+                                <tbody>
+                                    <tr>
+                                        <td><a class="btn btn-sm btn-secondary"
+                                                href="{{ product.get_absolute_url }}">View</a></td>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.price|floatformat:2 }}</td>
+                                        <td>{{ product.quantity }}</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-info" href="{{ product.get_update }}">Update</a>
+                                            <a class="btn btn-sm btn-danger"
+                                                href="{{ product.confirm_delete }}">Delete</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                                {% else %}
+                                <p>There are no product in the record.</p>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+
+        {% block pagination %}
+        {% if is_paginated %}
+        <div class="pagination">
+            <ul class="pagination pagination-sm">
+
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item page-current">
+                    <a class="page-link" href="#"><span>{{ page_obj.number }}</span></a>
+                </li>
+
+                <!-- <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span> -->
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="">Next</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% endblock %}

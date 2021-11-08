@@ -158,6 +158,7 @@ def topup_page(request):
 @login_required(login_url='/login/')
 def reload(request):
     sw = request.user.parent.studentwallet_set.all()
+    pw = request.user.parent.parentwallet
 
     myOption = SwalletFilter(request.GET, queryset=sw)
     sw = myOption.qs
@@ -179,6 +180,7 @@ def reload(request):
             'form': form,
             'myOption': myOption,
             'sw': sw,
+            'pw': pw
         }
         return render(request, "ewallet/reload.html", context)
 
@@ -355,8 +357,10 @@ def processReload(request):
     parent = request.user.parent
     p_wallet = parent.parentwallet
     s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])    
+
+    print(type(p_wallet.balance))
     
-    if p_wallet.balance > 0:
+    if (p_wallet.balance > 0.0):
         p_wallet.balance -= float(data['form']['amount'])
         p_wallet.save()
         s_wallet.balance += float(data['form']['amount'])
@@ -373,5 +377,5 @@ def processReload(request):
         )
         return JsonResponse('Payment Complete', safe=False)
     
-    else:
+    else:        
         return JsonResponse('Not enough balance', safe=False)
