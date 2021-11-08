@@ -124,9 +124,7 @@ class Transaction(models.Model):
     ]
     transaction_id = models.CharField(max_length=100, null=True)
     parent = models.ForeignKey(
-        Parent, null=True, blank=True, on_delete=models.SET_NULL)
-    p_wallet = models.ForeignKey(
-        ParentWallet, null=True, blank=True, on_delete=models.SET_NULL)
+        Parent, null=True, blank=True, on_delete=models.SET_NULL)    
     s_wallet = models.ForeignKey(
         StudentWallet, null=True, blank=True, on_delete=models.SET_NULL)
     timestamp = models.DateTimeField(auto_now_add=True)

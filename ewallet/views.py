@@ -5,20 +5,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
+from django.views.generic import ListView
 
-from .models import (
-    Student,
-    Parent,
-    ParentWallet,
-    StudentWallet,
-    Transaction,
-    Product,
-    Order,
-    OrderItem,
-    ShippingAddress,
-)
-from .forms import StudentForm, CreateUserForm, TransferForm, ReloadForm
-from .filters import TransactionFilter, SwalletFilter
+from .models import *
+from .forms import *
+from .filters import *
 from .decorators import unauthenticated_user
 import datetime
 import json
@@ -187,7 +178,8 @@ def reload(request):
 @login_required(login_url='/login/')
 def transaction_history(request):
     transactions = request.user.parent.transaction_set.all()
-
+    sw = request.user.parent.studentwallet_set.all()    
+    print(request.user.parent.student_set.all())
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
 
@@ -195,7 +187,7 @@ def transaction_history(request):
         'transactions': transactions,
         'myFilter': myFilter,
     }
-    return render(request, "ewallet/transaction_history.html", context)
+    return render(request, "ewallet/transaction_list.html", context)
 
 
 @login_required(login_url='/login/')

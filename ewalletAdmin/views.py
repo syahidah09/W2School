@@ -329,6 +329,7 @@ def processTransaction(request):
 
         Transaction.objects.create(
             s_wallet=s_wallet,
+            parent = s_wallet.parent,
             transaction_id=transaction_id,
             timestamp=datetime.datetime.now(),
             transaction_type='Scan & Pay',

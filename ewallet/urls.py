@@ -11,8 +11,8 @@ urlpatterns = [
     path('home/', views.homepage, name='home'), 
     path('wallet/', views.wallet_page, name='wallet'), 
     path('topup/', views.topup_page, name='topup'),
-    path('reload/', views.reload, name='reload'),     
-    path('transaction_history/', views.transaction_history, name='transaction_history'),
+    path('reload/', views.reload, name='reload'),      
+    path('transactions/', views.transaction_history, name='transactions'),
     path('process_transaction/', views.processTransaction, name="process_transaction"),
     path('process_reload/', views.processReload, name="process_reload"),     
 
