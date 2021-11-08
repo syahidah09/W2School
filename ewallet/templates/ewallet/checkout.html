@@ -62,14 +62,26 @@
                             </div>
                         </div>
                         <hr>
-                        <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+                        <!-- <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue"> -->
                     </form>
                 </div>
-
-                <br>
-                <div class="card card-body mb-0 hidden" id="payment-info">
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-body mb-0" id="payment-info">
                     <h5>Payment Methods:</h5>
                     <hr>
+                    <form id="wallet" method="POST">
+                        {% csrf_token %}
+                        <div class="col" id="reload-info">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" for="id_s_wallet">Student</span>
+                                {{form.s_wallet}}
+                            </div>                            
+                        </div>
+                        <input class="btn w3-theme-d4 rounded-pill w-100" type="submit" value="MyWallet">
+                    </form>
+
+                    <br>
                     <div id="paypal-button-container"></div>
                     <script>paypal.Buttons().render('body');</script>
                 </div>
@@ -80,7 +92,7 @@
 
 
 <script
-    src="https://www.paypal.com/sdk/js?client-id=ATzyeTiGEsu0HuzdhVamKQVJ_plMhONzIHh7WrsbpyopN9iN5FnBjUtWpuTXX0jm-h-w4XRSMH3Ux8xk&currency=MYR"></script>
+        src="https://www.paypal.com/sdk/js?client-id=ATzyeTiGEsu0HuzdhVamKQVJ_plMhONzIHh7WrsbpyopN9iN5FnBjUtWpuTXX0jm-h-w4XRSMH3Ux8xk&currency=MYR"></script>
 
 <script>
     total = '{{order.get_cart_total}}'
@@ -121,12 +133,20 @@
 <script type="text/javascript">
     var total = '{{order.get_cart_total}}'
 
-    var form = document.getElementById('form')
+    var form = document.getElementById('wallet')
     form.addEventListener('submit', function (e) {
         e.preventDefault()
-        console.log('Form submitted...')
-        document.getElementById('form-button').classList.add("hidden");
-        document.getElementById('payment-info').classList.remove("hidden");
+        console.log('MyWallet button clicked')
+
+        var pw = '{{ pw.balance }}'
+        if (total > parseInt(pw)) {
+            alert('Not enough balance. Please topup.');
+            window.location.href = "{% url 'ewallet:checkout' %}"
+        } else {
+            submitFormData2()
+        }
+        // document.getElementById('form-button').classList.add("hidden");
+        // document.getElementById('payment-info').classList.remove("hidden");
     })
 
     function submitFormData() {
@@ -150,11 +170,6 @@
         shippingInfo.state = form.state.value
         shippingInfo.zipcode = form.zipcode.value
 
-        if (user == 'AnonymousUser') {
-            userFormData.name = form.name.value
-            userFormData.email = form.email.value
-        }
-
         var url = '/process_order/'
         //post request
         fetch(url, {
@@ -175,6 +190,37 @@
                 window.location.href = "{% url 'ewallet:store' %}"
             })
     }
+
+    function submitFormData2() {
+        console.log('Payment btn clicked')
+
+        var FormData = {
+            's_wallet': form.s_wallet.value,
+            'amount': total,
+            'total': total,
+        }
+
+        var url = "/process_transaction/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': FormData })
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewallet:wallet' %}"
+            })
+    }
+</script>
+<script type="text/javascript">
+    document.getElementById('id_s_wallet').classList.add("form-select");   
 </script>
 
 {% endblock %}

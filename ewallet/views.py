@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.views.generic import ListView
+from django.core.paginator import Paginator, EmptyPage
+
 
 from .models import *
 from .forms import *
@@ -16,9 +18,11 @@ import json
 
 # @unauthenticated_user
 
+
 def frontPage(request):
     context = {}
     return render(request, "ewallet/frontdoor.html", context)
+
 
 def registerPage(request):
     form = CreateUserForm()
@@ -84,7 +88,7 @@ def homepage(request):
 
     pw = user.parent.parentwallet.balance
     sw = user.parent.studentwallet_set.all()
-    transactions = user.parent.transaction_set.all()
+    transactions = user.parent.transaction_set.all()[:5]
 
     context = {
         'pw': pw,
@@ -146,6 +150,7 @@ def topup_page(request):
         context = {'form': form}
         return render(request, "ewallet/topup.html", context)
 
+
 @login_required(login_url='/login/')
 def reload(request):
     sw = request.user.parent.studentwallet_set.all()
@@ -154,18 +159,18 @@ def reload(request):
     myOption = SwalletFilter(request.GET, queryset=sw)
     sw = myOption.qs
 
-    if request.method == 'POST':        
+    if request.method == 'POST':
         details = ReloadForm(request.POST)
-        
-        if details.is_valid():            
-            post = details.save(commit=False)            
+
+        if details.is_valid():
+            post = details.save(commit=False)
             post.save()
             return HttpResponse("data submitted successfully")
 
         else:
             return HttpResponse("data invalid")
-       
-    else:        
+
+    else:
         form = ReloadForm(None)
         context = {
             'form': form,
@@ -175,13 +180,21 @@ def reload(request):
         }
         return render(request, "ewallet/reload.html", context)
 
+
 @login_required(login_url='/login/')
-def transaction_history(request):
+def transaction_history(request, page=1):
     transactions = request.user.parent.transaction_set.all()
-    sw = request.user.parent.studentwallet_set.all()    
+    paginator = Paginator(transactions, 8) # 10 transactions per page
+    
     print(request.user.parent.student_set.all())
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
+
+    try:
+        transactions = paginator.page(page)
+    except EmptyPage:
+        # if we exceed the page limit we return the last page 
+        transactions = paginator.page(paginator.num_pages)
 
     context = {
         'transactions': transactions,
@@ -247,17 +260,36 @@ def cart(request):
 @login_required(login_url='/login/')
 def checkout(request):
     parent = request.user.parent
+    pw = request.user.parent.parentwallet
+    sw = request.user.parent.studentwallet_set.all()
+
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False)
     items = order.orderitem_set.all()
     cartItems = order.get_cart_items
 
-    context = {
-        'items': items,
-        'order': order,
-        'cartItems': cartItems
-    }
-    return render(request, 'ewallet/checkout.html', context)
+    if request.method == 'POST':
+        details = TransactionForm(request.POST)
+
+        if details.is_valid():
+            post = details.save(commit=False)
+            post.save()
+            return HttpResponse("data submitted successfully")
+
+        else:
+            return HttpResponse("data invalid")
+
+    else:
+        form = TransactionForm(None)
+        context = {
+            'form': form,
+            'items': items,
+            'order': order,
+            'cartItems': cartItems,
+            'pw': pw,
+            'sw': sw,
+        }
+        return render(request, 'ewallet/checkout.html', context)
 
 
 @login_required(login_url='/login/')
@@ -324,12 +356,40 @@ def processTransaction(request):
 
     parent = request.user.parent
     p_wallet = parent.parentwallet
+    p_wallet.balance -= float(data['form']['amount'])
+    p_wallet.save()
+    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
+
+    order, created = Order.objects.get_or_create(
+        parent=parent, complete=False)
+    total = float(data['form']['total'])
+    order.transaction_id = transaction_id
+
+    if total == order.get_cart_total:
+        order.complete = True
+    order.save()
+
+    Transaction.objects.create(
+        parent=parent,
+        s_wallet=s_wallet, # The item is for which student
+        transaction_id=transaction_id,
+        timestamp=datetime.datetime.now(),
+        transaction_type='Payment',
+        description='e-Store',
+        amount=data['form']['amount'],
+    )
+    return JsonResponse('Payment Complete', safe=False)
+
+
+@login_required(login_url='/login/')
+def processTopup(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    parent = request.user.parent
+    p_wallet = parent.parentwallet
     p_wallet.balance += float(data['form']['amount'])
     p_wallet.save()
-
-    # if total == transaction.get_cart_total:
-    #     transaction.complete = True
-    # transaction.save()
 
     Transaction.objects.create(
         parent=parent,
@@ -341,6 +401,7 @@ def processTransaction(request):
     )
     return JsonResponse('Payment Complete', safe=False)
 
+
 @login_required(login_url='/login/')
 def processReload(request):
     transaction_id = datetime.datetime.now().timestamp()
@@ -348,19 +409,19 @@ def processReload(request):
 
     parent = request.user.parent
     p_wallet = parent.parentwallet
-    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])    
+    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
 
     print(type(p_wallet.balance))
-    
+
     if (p_wallet.balance > 0.0):
         p_wallet.balance -= float(data['form']['amount'])
         p_wallet.save()
         s_wallet.balance += float(data['form']['amount'])
-        s_wallet.save()  
+        s_wallet.save()
 
         Transaction.objects.create(
             parent=parent,
-            s_wallet= s_wallet,
+            s_wallet=s_wallet,
             transaction_id=transaction_id,
             timestamp=datetime.datetime.now(),
             transaction_type='Transfer',
@@ -368,6 +429,6 @@ def processReload(request):
             amount=data['form']['amount'],
         )
         return JsonResponse('Payment Complete', safe=False)
-    
-    else:        
+
+    else:
         return JsonResponse('Not enough balance', safe=False)

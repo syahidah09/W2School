@@ -12,7 +12,9 @@ urlpatterns = [
     path('wallet/', views.wallet_page, name='wallet'), 
     path('topup/', views.topup_page, name='topup'),
     path('reload/', views.reload, name='reload'),      
-    path('transactions/', views.transaction_history, name='transactions'),
+    path('transactions/<int:page>/', views.transaction_history, name='transactions'),
+
+    path('process_topup/', views.processTopup, name="process_topup"),
     path('process_transaction/', views.processTransaction, name="process_transaction"),
     path('process_reload/', views.processReload, name="process_reload"),     
 

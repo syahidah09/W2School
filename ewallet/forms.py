@@ -89,4 +89,9 @@ class ReloadForm(ModelForm):
         
         # return any errors if found
         return self.cleaned_data
+
+class TransactionForm(ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ('s_wallet',)
         

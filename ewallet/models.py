@@ -146,16 +146,10 @@ class Transaction(models.Model):
     def __str__(self):
         return str(self.id)
 
-    @property
-    def add(self):
-        sum = self.parent.parentwallet.balance + self.amount
-        return sum
+    class Meta:
+        ordering = ['-timestamp'] # - means desceding
 
-    @property
-    def subtract(self):        
-        sum = self.parent.parentwallet.balance - self.amount
-        return sum
-
+    
 
 class Order(models.Model):
     parent = models.ForeignKey(

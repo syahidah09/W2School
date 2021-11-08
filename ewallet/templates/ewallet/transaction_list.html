@@ -19,85 +19,8 @@
 <!-- Section-->
 <section class="pb-0 pt-3">
   <div class="container-fluid">
-      <!-- Transaction Table -->
-      <!-- <div class="row gy-4">
-          <div class="col-lg-12">
-              <div class="card mb-0">
-                  <div class="card-body">
-                      <div class="table-responsive">
-                          <table class="table mb-0 align-middle" style="text-align: center">
-                              <thead>
-                                  <tr>
-                                      <th>Transaction ID</th>
-                                      <th>Transaction Type</th>
-                                      <th>Description</th>
-                                      <th>Amount</th>
-                                      <th>Date</th>                                      
-                                  </tr>
-                              </thead>
-                              {% if transaction_list %}
-                              {% for transaction in transaction_list %}
-                              <tbody>
-                                  <tr>
-                                      <td><a>{{ transaction.transaction_id }}</a></td>
-                                      <td>{{ transaction.transaction_type }}</td>
-                                      <td>{{ transaction.description }}</td>
-                                      <td>{{ transaction.amount|floatformat:2 }}</td>
-                                      <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>                                     
-                                  </tr>
-                              </tbody>
-                              {% endfor %}
-                              {% else %}
-                              <p>There are no transaction in the record.</p>
-                              {% endif %}
-                          </table>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div><br> -->
-
-      {% block pagination %}
-      {% if is_paginated %}
-      <div class="pagination">
-          <ul class="pagination pagination-sm">
-
-              {% if page_obj.has_previous %}
-              <li class="page-item">
-                  <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Previous</a>
-              </li>
-              {% else %}
-              <li class="page-item disabled">
-                  <a class="page-link" href="">Previous</a>
-              </li>
-              {% endif %}
-
-              <li class="page-item page-current">
-                  <a class="page-link" href="#"><span>{{ page_obj.number }}</span></a>
-              </li>       
-
-              {% if page_obj.has_next %}
-              <li class="page-item">
-                  <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next</a>
-              </li>
-              {% else %}
-              <li class="page-item disabled">
-                  <a class="page-link" href="">Next</a>
-              </li>
-              {% endif %}
-
-          </ul>
-      </div>
-      {% endif %}
-      {% endblock %}
-  </div>
-</section>
-
-<!-- Section-->
-<section class="pb-0 pt-3">
-  <div class="container-fluid">
     <!-- Filter Transactions -->
-    <div class="row gy-4">      
+    <div class="row gy-4">
       <div class="col-lg-12">
         <div class="card mb-0">
           <div class="card-body">
@@ -120,7 +43,7 @@
       </div>
     </div><br>
     <!-- Transactions -->
-    <div class="row gy-4">      
+    <div class="row gy-4">
       <div class="col-lg-12">
         <div class="card mb-0">
           <div class="card-body">
@@ -154,21 +77,69 @@
         </div>
       </div>
     </div><br>
-    <nav aria-label="...">
-      <ul class="pagination pagination-sm">
-        <li class="page-item disabled">
-          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-        </li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item" aria-current="page">
-          <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#">Next</a>
-        </li>
-      </ul>
-    </nav>
+
+    <!-- Pagination -->
+    <ul class="pagination pagination-sm">
+      <li class="page-item {% if not transactions.has_previous %} disabled {% endif %}">
+        <a class="page-link"
+           href="{% if transactions.has_previous %} {% url 'ewallet:transactions' transactions.previous_page_number %}{% endif %} ">Previous</a>
+      </li>
+
+      {% if transactions.number|add:'-1' > 1 %}
+      <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+      {% endif %}
+
+      <!-- Page numbers -->
+      {% for i in transactions.paginator.page_range %}
+      {% if transactions.number == i %}
+      <li class="active page-item disabled"><a class="page-link" href="#">{{ i }}</a></li>
+      {% elif i > transactions.number|add:'-2' and i < transactions.number|add:'2' %}
+      <li class="page-item"><a class="page-link" href="{% url 'ewallet:transactions' i %}">{{ i }}</a></li>
+      {% endif %}
+      {% endfor %}
+
+      {% if transactions.paginator.num_pages > transactions.number|add:'1' %}
+      <li class="page-item disabled"><a class="page-link" href="#">&hellip;</a></li>
+      {% endif %}
+
+      <li class="page-item {% if not transactions.has_next %} disabled {% endif %}">
+        <a class="page-link"
+           href="{% if transactions.has_next %} {% url 'ewallet:transactions' transactions.next_page_number %} {% endif %}">Next</a>
+      </li>
+
+      <!-- {% if transactions.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="{% url 'ewallet:transactions' transactions.previous_page_number %}">Previous</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <a class="page-link" href="">Previous</a>
+      </li>
+      {% endif %}
+
+      {% for i in transactions.paginator.page_range %}
+      {% if transactions.number == i %}
+      <li class='active mx-1'><span>{{ i }}</span></li>
+      {% else %}
+      <li class="mx-1"><a href="{% url 'ewallet:transactions' i %}">{{ i }}</a></li>
+      {% endif %}
+      {% endfor %}
+
+
+      {% if transactions.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{% url 'ewallet:transactions' transactions.next_page_number %}">Next</a>
+      </li>
+      {% else %}
+      <li class="page-item"><span class='disabled'>Next</span></li>
+      <li class="page-item disabled">
+        <a class="page-link" href="">Next</a>
+      </li>
+      {% endif %} -->
+
+    </ul>
+
+
   </div>
 </section>
 
