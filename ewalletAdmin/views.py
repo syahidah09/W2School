@@ -394,3 +394,15 @@ def transactions(request):
         'myFilter': myFilter,
     }
     return render(request, "ewalletAdmin/transactions.html", context)
+
+# Order Views
+class OrderListView(ListView):
+    model = Order
+    template_name = 'ewalletAdmin/order_list.html'
+    paginate_by = 10
+
+class OrderUpdateView(UpdateView):
+    model = Order
+    fields = ['received',]
+    template_name = 'ewalletAdmin/order_form.html'
+    success_url = "/admin2/orders/"

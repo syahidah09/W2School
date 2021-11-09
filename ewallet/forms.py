@@ -93,5 +93,5 @@ class ReloadForm(ModelForm):
 class TransactionForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ('s_wallet',)
+        fields = ('student',)
         

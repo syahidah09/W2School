@@ -90,6 +90,8 @@ def homepage(request):
     sw = user.parent.studentwallet_set.all()
     transactions = user.parent.transaction_set.all()[:5]
 
+    print(user.parent.student_set.all())
+
     context = {
         'pw': pw,
         'sw': sw,
@@ -157,7 +159,7 @@ def reload(request):
     pw = request.user.parent.parentwallet
 
     myOption = SwalletFilter(request.GET, queryset=sw)
-    sw = myOption.qs
+    sw = myOption.qs    
 
     if request.method == 'POST':
         details = ReloadForm(request.POST)
@@ -172,6 +174,8 @@ def reload(request):
 
     else:
         form = ReloadForm(None)
+        # filter only this user's child
+        form.fields["s_wallet"].queryset = request.user.parent.studentwallet_set.all()       
         context = {
             'form': form,
             'myOption': myOption,
@@ -261,7 +265,7 @@ def cart(request):
 def checkout(request):
     parent = request.user.parent
     pw = request.user.parent.parentwallet
-    sw = request.user.parent.studentwallet_set.all()
+    student = request.user.parent.student_set.all()
 
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False)
@@ -281,13 +285,14 @@ def checkout(request):
 
     else:
         form = TransactionForm(None)
+        form.fields["student"].queryset = request.user.parent.student_set.all() 
         context = {
             'form': form,
             'items': items,
             'order': order,
             'cartItems': cartItems,
             'pw': pw,
-            'sw': sw,
+            'student': student,
         }
         return render(request, 'ewallet/checkout.html', context)
 
@@ -321,7 +326,7 @@ def updateItem(request):
 
     return JsonResponse('Item was added', safe=False)
 
-
+# Pay w Paypal at checkout
 @login_required(login_url='/login/')
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
@@ -336,19 +341,10 @@ def processOrder(request):
     if total == order.get_cart_total:
         order.complete = True
     order.save()
-
-    ShippingAddress.objects.create(
-        parent=parent,
-        order=order,
-        address=data['shipping']['address'],
-        city=data['shipping']['city'],
-        state=data['shipping']['state'],
-        zipcode=data['shipping']['zipcode'],
-
-    )
+    
     return JsonResponse('Payment Complete', safe=False)
 
-
+# Pay w MyWallet at checkout
 @login_required(login_url='/login/')
 def processTransaction(request):
     transaction_id = datetime.datetime.now().timestamp()
@@ -358,7 +354,7 @@ def processTransaction(request):
     p_wallet = parent.parentwallet
     p_wallet.balance -= float(data['form']['amount'])
     p_wallet.save()
-    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
+    student = Student.objects.get(id=data['form']['student'])
 
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False)
@@ -371,7 +367,7 @@ def processTransaction(request):
 
     Transaction.objects.create(
         parent=parent,
-        s_wallet=s_wallet, # The item is for which student
+        student=student,         
         transaction_id=transaction_id,
         timestamp=datetime.datetime.now(),
         transaction_type='Payment',

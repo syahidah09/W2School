@@ -26,7 +26,6 @@ class Parent(models.Model):
         ordering = ['name']
 
 
-
 class Student(models.Model):
     student_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200, null=True)
@@ -38,7 +37,7 @@ class Student(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-    )   
+    )
 
     def get_absolute_url(self):
         return reverse('ewalletAdmin:student-detail', args=[str(self.student_id)])
@@ -101,7 +100,7 @@ class Product(models.Model):
         except:
             url = '/static/img/placeholder.png'
         return url
-    
+
     class Meta:
         ordering = ['name']
 
@@ -124,11 +123,13 @@ class Transaction(models.Model):
     ]
     transaction_id = models.CharField(max_length=100, null=True)
     parent = models.ForeignKey(
-        Parent, null=True, blank=True, on_delete=models.SET_NULL)    
+        Parent, null=True, blank=True, on_delete=models.SET_NULL)
+    student = models.ForeignKey(
+        Student, null=True, blank=True, on_delete=models.SET_NULL)  # as receiver for parent's on9 purchase
     s_wallet = models.ForeignKey(
         StudentWallet, null=True, blank=True, on_delete=models.SET_NULL)
     timestamp = models.DateTimeField(auto_now_add=True)
-    amount = models.FloatField(default=0)    
+    amount = models.FloatField(default=0)
     transaction_type = models.CharField(
         max_length=15, choices=TRANSACTION_TYPES, default='Payment')
     description = models.CharField(
@@ -147,15 +148,17 @@ class Transaction(models.Model):
         return str(self.id)
 
     class Meta:
-        ordering = ['-timestamp'] # - means desceding
+        ordering = ['-timestamp']  # - means desceding
 
-    
 
 class Order(models.Model):
     parent = models.ForeignKey(
         Parent, null=True, blank=True, on_delete=models.SET_NULL)
+    student = models.ForeignKey(
+        Student, null=True, blank=True, on_delete=models.SET_NULL)  # as receiver for parent's on9 purchase
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
+    received = models.BooleanField(default=False, null=True, blank=False)
     transaction_id = models.CharField(max_length=100, null=True)
 
     def __str__(self):
@@ -172,6 +175,9 @@ class Order(models.Model):
         orderitems = self.orderitem_set.all()
         total = sum([item.quantity for item in orderitems])
         return total
+
+    def get_update(self):
+        return reverse('ewalletAdmin:order-update', args=[str(self.id)])
 
 
 class OrderItem(models.Model):

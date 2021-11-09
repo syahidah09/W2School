@@ -42,4 +42,7 @@ urlpatterns = [
     path('product/<int:pk>/update', views.ProductUpdateView.as_view(), name='product-update'),
     path('product/<int:pk>/delete', views.ProductDeleteView.as_view(), name='product-delete'),
     
+    #  Order CBV
+    path('orders/', views.OrderListView.as_view(), name='orders'),
+    path('order/<int:pk>/update', views.OrderUpdateView.as_view(), name='order-update'),
 ]

@@ -1,5 +1,5 @@
 {% extends 'ewallet/base.html' %}
-
+{% load static %}
 {% block title %}
 <title>Home</title>
 {% endblock %}
@@ -235,5 +235,6 @@
         </div>
     </div>
 </section>
+<script src="{% static 'js/charts-custom.js' %}"></script>
 
 {% endblock %}

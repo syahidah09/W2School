@@ -75,7 +75,7 @@
                         <div class="col" id="reload-info">
                             <div class="input-group mb-3">
                                 <span class="input-group-text" for="id_s_wallet">Student</span>
-                                {{form.s_wallet}}
+                                {{form.student}}
                             </div>                            
                         </div>
                         <input class="btn w3-theme-d4 rounded-pill w-100" type="submit" value="MyWallet">
@@ -149,6 +149,7 @@
         // document.getElementById('payment-info').classList.remove("hidden");
     })
 
+    //  Pay w Paypal
     function submitFormData() {
         console.log('Payment btn clicked')
 
@@ -191,11 +192,12 @@
             })
     }
 
+    //  Pay w MyWallet
     function submitFormData2() {
         console.log('Payment btn clicked')
 
         var FormData = {
-            's_wallet': form.s_wallet.value,
+            'student': form.student.value,
             'amount': total,
             'total': total,
         }
@@ -220,7 +222,7 @@
     }
 </script>
 <script type="text/javascript">
-    document.getElementById('id_s_wallet').classList.add("form-select");   
+    document.getElementById('id_student').classList.add("form-select");   
 </script>
 
 {% endblock %}
