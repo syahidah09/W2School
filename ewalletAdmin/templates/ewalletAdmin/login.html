@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="https://cdn.tutorialjinni.com/choices.js/9.0.1/choices.min.css">
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
-    <link rel="stylesheet" href="{% static 'css/w3-theme-teal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/w3-theme-green.css' %}">
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}"> -->
 
     <title>Login</title>
@@ -45,13 +45,13 @@
                 <div class="card-body p-0">
                     <div class="row gx-0 align-items-stretch">
                         <!-- Logo & Information Panel-->
-                        <div class="col-lg-6 ">
+                        <div class="col-lg-6">
                             <div class="info w3-theme-d2 d-flex justify-content-center flex-column p-4 h-100">
                                 <div class="py-5">
                                     <h1><span>Wallet
                                         </span><strong>2</strong><span>School
                                         </span></h1>
-                                    <p class="fw-light mb-0">Welcome
+                                    <p class="fw-light mb-0">Welcome, administrator.
                                     </p>
                                 </div>
                             </div>
@@ -59,7 +59,6 @@
                         <!-- Form Panel    -->
                         <div class="col-lg-6 bg-white">
                             <div class="d-flex align-items-center px-4 px-lg-5 h-100">
-
                                 <form class="login-form py-5 w-100" method="POST" action="">
                                     {% for message in messages %}
                                     <p>{{message}}</p>
@@ -87,16 +86,16 @@
                                                    class="form-control">
                                         </div>
                                     </div>
+                                    <a class="text-sm text-paleBlue" href="#">Forgot Password?</a><br><br>
                                     <div class="d-flex flex-column gy-2">
-                                        <a class="text-sm text-paleBlue" href="#">Forgot Password?</a><br>
                                         <button class="btn w3-theme-d1 mb-3" type="submit">Login</button>
-                                        <small class="text-gray-700">Do not have an account? </small>
-                                        <a class="btn w3-theme-d1 mb-4" href="{% url 'ewallet:register' %}">Register</a>
-                                        <a class="btn w3-theme-d5 text-md " href="{% url 'ewallet:front_page' %}">Back</a>
+                                        <a class="btn w3-theme-d5 mb-3 text-md " href="{% url 'ewallet:front_page' %}">Back</a>
                                     </div>
 
-
+                                    <!-- <small class="text-gray-500">Do not have an account? </small>
+                                    <a class="text-sm text-paleBlue" href="{% url 'ewallet:register' %}">Register</a> -->
                                 </form>
+
                             </div>
                         </div>
                     </div>
