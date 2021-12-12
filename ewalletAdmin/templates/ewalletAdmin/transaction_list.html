@@ -35,7 +35,7 @@
                                         <th>Payer</th>
                                         <th>Transaction Type</th>
                                         <th>Description</th>
-                                        <th>Amount</th>
+                                        <th>Amount(RM)</th>
                                         <th>Date</th>
                                         <th>Action</th>
                                     </tr>
@@ -49,7 +49,7 @@
                                         <td>{{ transaction.transaction_type }}</td>
                                         <td>{{ transaction.description }}</td>
                                         <td>{{ transaction.amount|floatformat:2 }}</td>
-                                        <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                                        <td>{{ transaction.date|date:'d/m/Y' }}</td>
                                         <td><a class="btn btn-sm btn-info"
                                                href="{{ transaction.get_update }}">Update</a>
                                             <a class="btn btn-sm btn-danger"

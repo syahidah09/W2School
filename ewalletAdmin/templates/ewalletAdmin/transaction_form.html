@@ -23,17 +23,26 @@
     <form id="form" class="form-horizontal" method="POST" action="">
         {% csrf_token %}
         {% for field in form %}
-
         <div class="row gy-2 mb-4">
             <div class="col-sm-2">
                 <strong>{{ field.label_tag }}</strong>
             </div>
             <div class="col-sm-8">
                 {{ field }}
+               
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="row gy-2 mb-4">
+            <div class="col-sm-2">
+                <strong><label for="id_card_id">Card ID:</label></strong>
+            </div>
+            <div class="col-sm-8">
+                <input type="number" name="card_id" step="any" required="" id="id_card_id" class="form-control">
             </div>
         </div>
 
-        {% endfor %}
         <div class="row">
             <div class="col-sm-10 ms-auto">
                 <input class="btn btn-primary" type="submit" value="Submit">
@@ -50,28 +59,45 @@
         e.preventDefault()
         console.log('Form Submitted...')
         console.log('Continue button clicked')        
-        console.log('Student: ', form.s_wallet.value)
-        console.log('Amount: ', form.amount.value)
+        console.log('Student: ', form.student.value)
+        console.log('Amount: ', form.amount.value)      
+        
+        // How to select which student from here
+        var students = JSON.parse('{{ student | safe }}')
+        console.log(students)
 
-        // var reloadamount = form.amount.value
-        // var pw = '{{ pw.balance }}'        
-        // if (reloadamount > parseInt(pw)) { 
-        //     console.log('Reload amount is bigger than wallet balance')
-        //     alert('Not enough balance. Please topup.');
-        //     window.location.href = "{% url 'ewallet:wallet' %}"
-        // } else {            
-        //     submitFormData()
-        // }
+        for (let i in student) {
+            console.log('{{ student.card_id }}')
+        }
+        
+        var cardId = '{{ student.card_id }}'  
+        var wallet_balance = '{{ student.wallet_balance }}' 
+        var total_amount = form.amount.value
 
-        submitFormData()
-            
+        if(cardId == form.card_id.value){
+            console.log('Reg Card Id:', cardId)
+
+            if (parseInt(wallet_balance > total_amount)) { 
+            console.log('Total amount is bigger than wallet balance')
+            alert('Not enough balance. Please topup.');
+            window.location.href = "{% url 'ewalletAdmin:transactions' %}"
+            } else {            
+                submitFormData()
+            }    
+
+        } else {
+            console.log('Card mismatch!')
+            console.log('Reg Card Id:', cardId)
+            console.log('Card ID: ', form.card_id.value)
+        }
     })
 
     function submitFormData() {
         console.log('Payment btn clicked')
 
-        var transFormData = {            
-            's_wallet': form.s_wallet.value,
+        var Data = {            
+            'student': form.student.value,
+            'card_id': form.card_id.value,
             'amount': form.amount.value,
         }
         
@@ -82,7 +108,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken,
             },
-            body: JSON.stringify({ 'form': transFormData })
+            body: JSON.stringify({ 'form': Data })
         })
 
             //promise, turn the data to json value
@@ -98,7 +124,7 @@
 
 <script type="text/javascript">    
     document.getElementById('id_amount').classList.add("form-control");
-    document.getElementById('id_s_wallet').classList.add("form-control");   
+    document.getElementById('id_student').classList.add("form-select");   
 </script>
 
 {% endblock %}
