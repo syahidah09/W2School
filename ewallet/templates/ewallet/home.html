@@ -18,34 +18,31 @@
     <div class="container-fluid">
         <div class="card mb-0">
             <div class="card-body">
-                <div class="row gx-5 bg-white">
+                <div class="d-flex flex-row flex-wrap align-items-center gx-5 bg-white">
                     <!-- Parent Wallet -->
-                    <div class="col-xl-4 col-sm-6 py-4 border-lg-end border-gray-200">
+                    <div class="col-xl-3 col-sm-3 py-4 px-4 border-lg-end border-gray-200">
                         <div class="d-flex align-items-center">
                             <div class="icon flex-shrink-0 bg-violet">
                                 <i class="fas fa-university" aria-hidden="true"></i>
                             </div>
                             <div class="mx-3">
                                 <h6 class="h4 fw-light mb-1"><strong class="text-lg">My Wallet</strong></h6>
-                                <div class="number text-gray-600 ">RM {{ pw|floatformat:2 }}</div>
+                                <div class="number text-gray-600 ">RM {{ parent.wallet_balance|floatformat:2 }}</div>
                             </div>
                         </div>
                     </div>
-                    {% for s_wallet in sw %}
-                    <div class="col-xl-4 col-sm-6 py-4 border-lg-end border-gray-200">
-                        <div class="d-flex align-items-center">
-                            <div class="icon flex-shrink-0 bg-red">
-                                <i class="fas fa-university" aria-hidden="true"></i>
-                            </div>
-                            <div class="mx-3">
-                                <h6 class="h4 fw-light mb-1"><strong class="text-lg">{{ s_wallet.student }}</strong>
-                                </h6>
-                                <div class="number text-gray-600 ">RM {{ s_wallet.balance|floatformat:2 }}</div>
-                            </div>
+                    {% for s in student %}
+                    <div class="d-flex align-items-center col-sm-3 py-4 px-4 border-lg-end border-gray-200">
+                        <div class="icon flex-shrink-0 bg-red">
+                            <i class="fas fa-university" aria-hidden="true"></i>
+                        </div>
+                        <div class="mx-3">
+                            <h6 class="h4 fw-light mb-1"><strong class="text-lg">{{ s.name }}</strong>
+                            </h6>
+                            <div class="number text-gray-600 ">RM {{ s.wallet_balance|floatformat:2 }}</div>
                         </div>
                     </div>
                     {% endfor %}
-
                 </div>
             </div>
         </div>
@@ -64,11 +61,11 @@
                         <div class="card-close">
                             <div class="dropdown">
                                 <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"><i
-                                        class="fas fa-ellipsis-v"></i></button>
+                                        data-bs-toggle="dropdown" aria-expanded="false"><i
+                                       class="fas fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1">
                                     <a class="dropdown-item py-1 px-3 remove" href="#"> <i
-                                            class="fas fa-times"></i>Close</a>
+                                           class="fas fa-times"></i>Close</a>
                                     <a class="dropdown-item py-1 px-3 edit" href="#"> <i class="fas fa-cog"></i>Edit</a>
                                 </div>
                             </div>
@@ -112,12 +109,12 @@
                         <div class="card-close">
                             <div class="dropdown">
                                 <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"><i
-                                        class="fas fa-ellipsis-v"></i></button>
+                                        data-bs-toggle="dropdown" aria-expanded="false"><i
+                                       class="fas fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
-                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
-                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
-                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                                       class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                           class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                       href="#"> <i class="fas fa-cog"></i>Edit</a></div>
                             </div>
                         </div>
                         <h3 class="h4 mb-0">School Notices</h3>
@@ -134,8 +131,8 @@
                                 </div>
                             </div>
                             <div class="text-end ms-2"><strong
-                                    class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
-                                    class="d-block lh-1 text-gray-500">May</small></div>
+                                        class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
+                                       class="d-block lh-1 text-gray-500">May</small></div>
                         </div>
                         <!-- Item-->
                         <div class="p-3 d-flex justify-content-between bg-light">
@@ -148,8 +145,8 @@
                                 </div>
                             </div>
                             <div class="text-end ms-2"><strong
-                                    class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
-                                    class="d-block lh-1 text-gray-500">May</small></div>
+                                        class="d-block lh-1 h2 mb-0 text-gray-500">24</strong><small
+                                       class="d-block lh-1 text-gray-500">May</small></div>
                         </div>
 
                     </div>
@@ -170,12 +167,12 @@
                         <div class="card-close">
                             <div class="dropdown">
                                 <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"><i
-                                        class="fas fa-ellipsis-v"></i></button>
+                                        data-bs-toggle="dropdown" aria-expanded="false"><i
+                                       class="fas fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
-                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
-                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
-                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                                       class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                           class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                       href="#"> <i class="fas fa-cog"></i>Edit</a></div>
                             </div>
                         </div>
                         <h3 class="h4 mb-0">Line Chart Example</h3>
@@ -191,12 +188,12 @@
                         <div class="card-close">
                             <div class="dropdown">
                                 <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"><i
-                                        class="fas fa-ellipsis-v"></i></button>
+                                        data-bs-toggle="dropdown" aria-expanded="false"><i
+                                       class="fas fa-ellipsis-v"></i></button>
                                 <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
-                                        class="dropdown-item py-1 px-3 remove" href="#"> <i
-                                            class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
-                                        href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                                       class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                           class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                       href="#"> <i class="fas fa-cog"></i>Edit</a></div>
                             </div>
                         </div>
                         <h3 class="h4 mb-0">Line Chart Example</h3>
@@ -209,12 +206,12 @@
                     <div class="card-close">
                         <div class="dropdown">
                             <button class="dropdown-toggle text-sm" type="button" id="closeCard1"
-                                data-bs-toggle="dropdown" aria-expanded="false"><i
-                                    class="fas fa-ellipsis-v"></i></button>
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i
+                                   class="fas fa-ellipsis-v"></i></button>
                             <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1"><a
-                                    class="dropdown-item py-1 px-3 remove" href="#"> <i
-                                        class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
-                                    href="#"> <i class="fas fa-cog"></i>Edit</a></div>
+                                   class="dropdown-item py-1 px-3 remove" href="#"> <i
+                                       class="fas fa-times"></i>Close</a><a class="dropdown-item py-1 px-3 edit"
+                                   href="#"> <i class="fas fa-cog"></i>Edit</a></div>
                         </div>
                     </div>
                     <div class="card-body">

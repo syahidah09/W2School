@@ -18,7 +18,7 @@
 <section class="pb-0 pt-3">
     <div class="container-fluid">
         <div class="row gy-3">
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
                         <h3 class="h4 mb-0" style="text-align: center">Total Students</h3>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
                         <h3 class="h4 mb-0" style="text-align: center">Total Registered Parent</h3>
@@ -37,21 +37,8 @@
                         <h1 style="text-align: center;padding: 5px">{{ parents.count }}</h1>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="card bg-light mb-1 border-dark">
-                    <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Test</h3>
-                    </div>
-                    <div class="card-body">
-                        <h1 style="text-align: center;padding: 5px">test</h1>
-                    </div>
-                </div>
-            </div>
-
+            </div>      
         </div>
-
-
     </div>
 </section>
 
@@ -97,7 +84,7 @@
                                         <td>{{ transaction.transaction_type }}</td>
                                         <td>{{ transaction.description }}</td>
                                         <td>{{ transaction.amount|floatformat:2 }}</td>
-                                        <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                                        <td>{{ transaction.date|date:'d/m/Y' }}</td>
                                     </tr>
                                 </tbody>
                                 {% endfor %}
