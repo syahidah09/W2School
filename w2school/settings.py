@@ -38,11 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'ewallet',
+    'ewallet',    
     'ewalletAdmin',
     'account',
 
     'django_filters',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +82,12 @@ WSGI_APPLICATION = 'w2school.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Demo_test',
+        'USER': 'postgres',
+        'PASSWORD': 'syida.99',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -133,3 +138,4 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, "static/images")
 MEDIA_URL = '/images/'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

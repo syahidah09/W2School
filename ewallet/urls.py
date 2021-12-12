@@ -3,12 +3,15 @@ from . import views
 
 app_name = 'ewallet'
 urlpatterns = [
-    path('', views.frontPage, name=''),
+    path('', views.frontPage, name='front_page'),
     path('register/', views.registerPage, name='register'),
     path('login/', views.loginPage, name='login'),
     path('logout/', views.logoutUser, name='logout'),
 
     path('home/', views.homepage, name='home'),
+    path('user_profile/', views.user_detail, name='user_detail'),
+    path('user_update/', views.user_update, name='user_update'),
+
     path('wallet/', views.wallet_page, name='wallet'),
     path('topup/', views.topup_page, name='topup'),
     path('reload/', views.reload, name='reload'),
@@ -26,6 +29,6 @@ urlpatterns = [
     path('update_item/', views.updateItem, name="update_item"),
     path('process_order/', views.processOrder, name="process_order"),
 
-    path('add_dependent/', views.add_dependent, name='add_dependent'),
+   
 
 ]

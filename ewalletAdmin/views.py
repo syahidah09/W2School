@@ -7,12 +7,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
+from django.core import serializers
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 from ewallet.models import *
-from ewallet.decorators import allowed_users
+from ewallet.decorators import *
 from .forms import *
 from .filters import *
+from .serializers import *
 
 
 def registerPage(request):
@@ -48,7 +50,7 @@ def registerPage(request):
     return render(request, "ewallet/register.html", context)
 
 
-# @unauthenticated_user
+@unauthenticated_user
 def loginPage(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -58,15 +60,19 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('/home/')
+            return redirect('/admin2/')
         else:
             messages.info(request, 'Username OR password is incorrect')
     context = {}
-    return render(request, "ewallet/login.html", context)
-
-# @allowed_users(allowed_roles=['admin'])
+    return render(request, "ewalletAdmin/login.html", context)
 
 
+def logoutUser(request):
+    logout(request)
+    return redirect('/admin2/login/')
+
+
+@login_required(login_url='/admin2/login/')
 def homepage(request):
     transactions = Transaction.objects.all()[:5]
     students = Student.objects.all()
@@ -79,7 +85,7 @@ def homepage(request):
     }
     return render(request, "ewalletAdmin/home.html", context)
 
-# Student Model Views
+# -------------- Student Views --------------
 
 
 class StudentCreateView(CreateView):
@@ -89,10 +95,41 @@ class StudentCreateView(CreateView):
     success_url = "/admin2/students/"
 
 
+def StudentCreateView2(request):
+    # parent = Parent.objects.get(id=pk)
+    form = StudentForm()
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = StudentForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            form.save()
+
+            StudentWallet.objects.create(
+                student=Student.objects.get(
+                    student_id=request.POST.get('student_id')),
+                parent=Parent.objects.get(id=request.POST.get('parent')),
+            )
+
+            return redirect('/admin2/students/')
+        else:
+            print("form not valid")
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = StudentForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, "ewalletAdmin/student_form.html", context)
+
+
 class StudentListView(ListView):
     model = Student
     template_name = 'ewalletAdmin/student_list.html'
-    paginate_by = 5
+    paginate_by = 15
     # context_object_name = 'classgroup'
 
     # def get_queryset(self):
@@ -101,12 +138,13 @@ class StudentListView(ListView):
 
 class StudentDetailView(DetailView):
     model = Student
+    fields = ('student_id', 'name', 'class_name', 'parent', 'card_id')
     template_name = 'ewalletAdmin/student_detail.html'
 
 
 class StudentUpdateView(UpdateView):
     model = Student
-    fields = '__all__'
+    fields = ('student_id', 'name', 'class_name', 'parent', 'card_id')
     template_name = 'ewalletAdmin/student_form.html'
     success_url = "/admin2/students/"
 
@@ -118,76 +156,89 @@ class StudentDeleteView(DeleteView):
     success_url = "/admin2/students/"
 
 
-def manageStudent(request):
-    student = Student.objects.all()
+# def manageStudent(request):
+#     student = Student.objects.all()
 
-    myFilter = StudentFilter(request.GET, queryset=student)
-    student = myFilter.qs
+#     myFilter = StudentFilter(request.GET, queryset=student)
+#     student = myFilter.qs
 
-    context = {
-        'students': student,
-        'myFilter': myFilter,
-    }
-    return render(request, "ewalletAdmin/manage_student.html", context)
-
-
-def createStudent(request):
-
-    student_form = StudentForm()
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        student_form = StudentForm(request.POST)
-        # check whether it's valid:
-        if student_form.is_valid():
-            student_form.save()
-            return redirect('/admin2/students/')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        student_form = StudentForm()
-
-    context = {
-        'student_form': student_form,
-    }
-    return render(request, "ewalletAdmin/student_form.html", context)
+#     context = {
+#         'students': student,
+#         'myFilter': myFilter,
+#     }
+#     return render(request, "ewalletAdmin/manage_student.html", context)
 
 
-def updateStudent(request, pk):
-    student = Student.objects.get(student_id=pk)
+# def createStudent(request):
 
-    student_form = StudentForm(instance=student)
-    if request.method == 'POST':
-        student_form = StudentForm(request.POST, instance=student)
-        if student_form.is_valid():
-            student_form.save()
-            return redirect('/admin2/students/')
+#     student_form = StudentForm()
+#     if request.method == 'POST':
+#         # create a form instance and populate it with data from the request:
+#         student_form = StudentForm(request.POST)
+#         # check whether it's valid:
+#         if student_form.is_valid():
+#             student_form.save()
+#             return redirect('/admin2/students/')
 
-    context = {
-        'student_form': student_form,
-    }
-    return render(request, "ewalletAdmin/student_form.html", context)
+#     # if a GET (or any other method) we'll create a blank form
+#     else:
+#         student_form = StudentForm()
 
-# Parent Model Views
-# class ParentCreateView(CreateView):
-#     model = Parent
-#     fields = '__all__'
-#     template_name = 'ewalletAdmin/parent_form.html'
-#     success_url ="/admin2/parents/"
+#     context = {
+#         'student_form': student_form,
+#     }
+#     return render(request, "ewalletAdmin/student_form.html", context)
+
+
+# def updateStudent(request, pk):
+#     student = Student.objects.get(student_id=pk)
+
+#     student_form = StudentForm(instance=student)
+#     if request.method == 'POST':
+#         student_form = StudentForm(request.POST, instance=student)
+#         if student_form.is_valid():
+#             student_form.save()
+#             return redirect('/admin2/students/')
+
+#     context = {
+#         'student_form': student_form,
+#     }
+#     return render(request, "ewalletAdmin/student_form.html", context)
+
+# -------------- Parent Views --------------
+
+
+class ParentCreateView(CreateView):
+    model = Parent
+    fields = '__all__'
+    template_name = 'ewalletAdmin/parent_form.html'
+    success_url = "/admin2/parents/"
 
 
 class ParentListView(ListView):
     model = Parent
     template_name = 'ewalletAdmin/parent_list.html'
-    paginate_by = 5
+    paginate_by = 15
     # context_object_name = 'classgroup'
 
     # def get_queryset(self):
     #     return Student.objects.filter(classgroup='5 Sina')
 
 
-class ParentDetailView(DetailView):
-    model = Parent
-    template_name = 'ewalletAdmin/parent_detail.html'
+# class ParentDetailView(DetailView):
+#     model = Parent
+#     template_name = 'ewalletAdmin/parent_detail.html'
+
+
+def ParentDetailView2(request, pk):
+    parent = Parent.objects.get(id=pk)
+    student = parent.student_set.all()
+    context = {
+        'parent': parent,
+        'student': student,
+    }
+
+    return render(request, "ewalletAdmin/parent_detail.html", context)
 
 
 class ParentUpdateView(UpdateView):
@@ -207,7 +258,9 @@ class ParentDeleteView(DeleteView):
     template_name = 'ewalletAdmin/parent_confirm_delete.html'
     success_url = "/admin2/parents/"
 
-# Product Model Views
+# -------------- Product Views --------------
+
+
 class ProductCreateView(CreateView):
     model = Product
     fields = '__all__'
@@ -243,103 +296,99 @@ class ProductDeleteView(DeleteView):
     template_name = 'ewalletAdmin/product_confirm_delete.html'
     success_url = "/admin2/products/"
 
-def productPage(request):
+
+# -------------- Store Views --------------
+# To record payment at school
+
+
+def storePage(request):
     products = Product.objects.all()
 
     myFilter = ProductFilter(request.GET, queryset=products)
-    student = myFilter.qs
+    products = myFilter.qs
+
+    if 'check' in request.GET:
+        students = Student.objects.all()
+        card = CardFilter(request.GET, queryset=students)
+        students = card.qs
+        count = 0
+        for i in students:
+            count += 1
+            print(count)
 
     context = {
         'products': products,
         'myFilter': myFilter,
     }
-    return render(request, "ewalletAdmin/products.html", context)
+    return render(request, "ewalletAdmin/store.html", context)
+
+# -------------- Transaction  Views --------------
 
 
-def createProduct(request):
+# class TransactionCreateView(CreateView):
+#     model = Transaction
+#     fields = [
+#         'student',
+#         'amount'
+#     ]
 
-    product_form = ProductForm()
+#     template_name = 'ewalletAdmin/transaction_form.html'
+#     success_url = "/admin2/transactions/"
+
+def TransactionCreateView2(request):
+    student = serializers.serialize("json", Student.objects.all())
+
     if request.method == 'POST':
-        product_form = ProductForm(request.POST)
-        if product_form.is_valid():
-            product_form.save()
-            return redirect('/admin2/products/')
+        details = TransactionForm(request.POST)
 
-    # if a GET (or any other method) we'll create a blank form
+        if details.is_valid():
+            post = details.save(commit=False)
+            post.save()
+            return HttpResponse("data submitted successfully")
+
+        else:
+            return HttpResponse("data invalid")
+
     else:
-        product_form = ProductForm()
+        form = TransactionForm(None)
 
-    context = {
-        'product_form': product_form,
-    }
-    return render(request, "ewalletAdmin/product_form.html", context)
-
-
-def updateProduct(request, pk):
-    product = Product.objects.get(id=pk)
-
-    product_form = ProductForm(instance=product)
-    if request.method == 'POST':
-        product_form = ProductForm(request.POST, instance=product)
-        if product_form.is_valid():
-            product_form.save()
-            return redirect('/admin2/products/')
-
-    context = {
-        'product_form': product_form,
-    }
-    return render(request, "ewalletAdmin/product_form.html", context)
-
-
-def deleteProduct(request, pk):
-    product = Product.objects.get(id=pk)
-
-    if request.method == 'POST':
-        product.delete()
-        return redirect('/admin2/products/')
-
-    context = {
-        'item': product,
-    }
-    return render(request, "ewalletAdmin/delete.html", context)
-
-# Transaction Model Views
-
-
-class TransactionCreateView(CreateView):
-    model = Transaction
-    fields = [
-        's_wallet',
-        'amount'
-    ]
-
-    template_name = 'ewalletAdmin/transaction_form.html'
-    success_url = "/admin2/transactions/"
+        context = {
+            'form': form,
+            'student': student,
+        }
+        return render(request, "ewalletAdmin/transaction_form.html", context)
 
 
 def processTransaction(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
-    
-    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
 
-    if (s_wallet.balance > float(data['form']['amount'])):
-        s_wallet.balance -= float(data['form']['amount'])
-        s_wallet.save()
+    student = Student.objects.get(student_id=data['form']['student'])
 
-        Transaction.objects.create(
-            s_wallet=s_wallet,
-            parent = s_wallet.parent,
-            transaction_id=transaction_id,
-            timestamp=datetime.datetime.now(),
-            transaction_type='Scan & Pay',
-            description='Co-op',
-            amount=data['form']['amount'],
-        )
-        return JsonResponse('Payment Complete', safe=False)
+    if(student.card_id == data['form']['card_id']):
+        print(student.card_id, data['form']['card_id'])
+
+        if (student.wallet_balance > float(data['form']['amount'])):
+            student.wallet_balance -= float(data['form']['amount'])
+            student.save()
+
+            Transaction.objects.create(
+                student=student,
+                parent=student.parent,
+                transaction_id=transaction_id,
+                date=datetime.datetime.now(),
+                transaction_type='Scan & Pay',
+                description='Co-op',
+                amount=data['form']['amount'],
+            )
+            return JsonResponse('Payment Complete', safe=False)
+
+        else:
+            return JsonResponse('Not enough balance', safe=False)
 
     else:
-        return JsonResponse('Not enough balance', safe=False)
+        print(student.card_id, data['form']['card_id'])
+        return JsonResponse('Card not matched', safe=False)
 
 
 class TransactionListView(ListView):
@@ -383,26 +432,29 @@ class TransactionDeleteView(DeleteView):
     success_url = "/admin2/transactions/"
 
 
-def transactions(request):
-    transactions = Transaction.objects.all()
+# def transactions(request):
+#     transactions = Transaction.objects.all()
 
-    myFilter = TransactionFilter(request.GET, queryset=transactions)
-    transactions = myFilter.qs
+#     myFilter = TransactionFilter(request.GET, queryset=transactions)
+#     transactions = myFilter.qs
 
-    context = {
-        'transactions': transactions,
-        'myFilter': myFilter,
-    }
-    return render(request, "ewalletAdmin/transactions.html", context)
+#     context = {
+#         'transactions': transactions,
+#         'myFilter': myFilter,
+#     }
+#     return render(request, "ewalletAdmin/transactions.html", context)
 
-# Order Views
+# -------------- Order Views --------------
+
+
 class OrderListView(ListView):
     model = Order
     template_name = 'ewalletAdmin/order_list.html'
     paginate_by = 10
 
+
 class OrderUpdateView(UpdateView):
     model = Order
-    fields = ['received',]
+    fields = ['received', ]
     template_name = 'ewalletAdmin/order_form.html'
     success_url = "/admin2/orders/"

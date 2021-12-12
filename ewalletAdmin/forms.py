@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from ewallet.models import Student, Product
+from ewallet.models import *
 
 class ProductForm(ModelForm):
     class Meta:
@@ -18,4 +18,7 @@ class StudentForm(ModelForm):
     class Meta:
         model = Student
         fields = '__all__'
-        
+class TransactionForm(ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ('student', 'amount',) 

@@ -5,25 +5,25 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, UpdateView
 from django.core.paginator import Paginator, EmptyPage
 
 
 from .models import *
 from .forms import *
 from .filters import *
-from .decorators import unauthenticated_user
+from .decorators import *
 import datetime
 import json
 
-# @unauthenticated_user
 
-
+@unauthenticated_user
 def frontPage(request):
     context = {}
-    return render(request, "ewallet/frontdoor.html", context)
+    return render(request, "ewallet/frontpage.html", context)
 
 
+@unauthenticated_user
 def registerPage(request):
     form = CreateUserForm()
     if request.method == 'POST':
@@ -33,6 +33,7 @@ def registerPage(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
 
             group, created = Group.objects.get_or_create(name='parent')
             print("Group id: " + str(group))
@@ -41,9 +42,7 @@ def registerPage(request):
             Parent.objects.create(
                 user=user,
                 name=user.username,
-            )
-            ParentWallet.objects.create(
-                parent=user.parent,
+                email=email,
             )
 
             messages.success(
@@ -62,11 +61,12 @@ def loginPage(request):
 
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if (user is not None) and (user.groups.filter(name="parent")):
             login(request, user)
             return redirect('/home/')
         else:
             messages.info(request, 'Username OR password is incorrect')
+            
     context = {}
     return render(request, "ewallet/login.html", context)
 
@@ -77,6 +77,32 @@ def logoutUser(request):
 
 
 @login_required(login_url='/login/')
+def user_detail(request):
+    parent = request.user.parent
+    context = {
+        'parent': parent
+    }
+    return render(request, "ewallet/user_detail.html", context)
+
+
+@login_required(login_url='/login/')
+def user_update(request):
+    parent = request.user.parent
+    parent_form = ParentForm(instance=parent)
+
+    if request.method == 'POST':
+        parent_form = ParentForm(request.POST, instance=parent)
+        if parent_form.is_valid():
+            parent_form.save()
+            return redirect('/user_profile/')
+
+    context = {
+        'parent_form': parent_form
+    }
+    return render(request, "ewallet/user_form.html", context)
+
+
+@login_required(login_url='/login/')
 def homepage(request):
     user = request.user
 
@@ -84,17 +110,15 @@ def homepage(request):
         print("User " + user.username + " is NOT in a group parent")
         messages.info(request, 'You need to login with a non-admin account')
         logout(request)
-        return redirect('/login/')
+        return redirect('/')
 
-    pw = user.parent.parentwallet.balance
-    sw = user.parent.studentwallet_set.all()
+    parent = user.parent
+    student = parent.student_set.all()
     transactions = user.parent.transaction_set.all()[:5]
 
-    print(user.parent.student_set.all())
-
     context = {
-        'pw': pw,
-        'sw': sw,
+        'parent': parent,
+        'student': student,
         'transactions': transactions,
     }
     return render(request, "ewallet/home.html", context)
@@ -102,17 +126,12 @@ def homepage(request):
 
 @login_required(login_url='/login/')
 def wallet_page(request):
-    user = request.user
-
-    pwb = user.parent.parentwallet.balance
-    sw = user.parent.studentwallet_set.all()
-
-    # transaction = Transaction.objects.get_or_create(transaction_id=1, transaction_type='Deposit')
+    parent = request.user.parent
+    student = parent.student_set.all()
 
     context = {
-        'pwb': pwb,
-        'sw': sw,
-        # 'student': student,
+        'parent': parent,
+        'student': student,
     }
 
     return render(request, "ewallet/wallet.html", context)
@@ -155,11 +174,12 @@ def topup_page(request):
 
 @login_required(login_url='/login/')
 def reload(request):
-    sw = request.user.parent.studentwallet_set.all()
-    pw = request.user.parent.parentwallet
+    user = request.user
+    parent = user.parent
+    student = parent.student_set.all()
 
-    myOption = SwalletFilter(request.GET, queryset=sw)
-    sw = myOption.qs    
+    myOption = StudenttFilter(request.GET, queryset=student)
+    s = myOption.qs
 
     if request.method == 'POST':
         details = ReloadForm(request.POST)
@@ -175,12 +195,12 @@ def reload(request):
     else:
         form = ReloadForm(None)
         # filter only this user's child
-        form.fields["s_wallet"].queryset = request.user.parent.studentwallet_set.all()       
+        form.fields["student"].queryset = student
+
         context = {
             'form': form,
             'myOption': myOption,
-            'sw': sw,
-            'pw': pw
+            's': s,
         }
         return render(request, "ewallet/reload.html", context)
 
@@ -188,8 +208,8 @@ def reload(request):
 @login_required(login_url='/login/')
 def transaction_history(request, page=1):
     transactions = request.user.parent.transaction_set.all()
-    paginator = Paginator(transactions, 8) # 10 transactions per page
-    
+    paginator = Paginator(transactions, 8)  # 10 transactions per page
+
     print(request.user.parent.student_set.all())
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
@@ -197,7 +217,7 @@ def transaction_history(request, page=1):
     try:
         transactions = paginator.page(page)
     except EmptyPage:
-        # if we exceed the page limit we return the last page 
+        # if we exceed the page limit we return the last page
         transactions = paginator.page(paginator.num_pages)
 
     context = {
@@ -208,33 +228,10 @@ def transaction_history(request, page=1):
 
 
 @login_required(login_url='/login/')
-def add_dependent(request):
-    student_form = StudentForm()
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        student_form = StudentForm(request.POST)
-        # check whether it's valid:
-        if student_form.is_valid():
-            student_form.save()
-            return redirect('/wallet/')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        student_form = StudentForm()
-
-    context = {
-        'student_form': student_form,
-    }
-    return render(request, "ewallet/add_dependent.html", context)
-
-
-@login_required(login_url='/login/')
 def store(request):
     parent = request.user.parent
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False)
-    items = order.orderitem_set.all()
     cartItems = order.get_cart_items
 
     products = Product.objects.all()
@@ -248,7 +245,7 @@ def store(request):
 @login_required(login_url='/login/')
 def cart(request):
     parent = request.user.parent
-    order, created = Order.objects.get_or_create(
+    order = Order.objects.get(
         parent=parent, complete=False)
     items = order.orderitem_set.all()
     cartItems = order.get_cart_items
@@ -264,10 +261,9 @@ def cart(request):
 @login_required(login_url='/login/')
 def checkout(request):
     parent = request.user.parent
-    pw = request.user.parent.parentwallet
-    student = request.user.parent.student_set.all()
+    student = parent.student_set.all()
 
-    order, created = Order.objects.get_or_create(
+    order = Order.objects.get(
         parent=parent, complete=False)
     items = order.orderitem_set.all()
     cartItems = order.get_cart_items
@@ -285,14 +281,15 @@ def checkout(request):
 
     else:
         form = TransactionForm(None)
-        form.fields["student"].queryset = request.user.parent.student_set.all() 
+        form.fields["student"].queryset = student
+
         context = {
             'form': form,
             'items': items,
             'order': order,
             'cartItems': cartItems,
-            'pw': pw,
             'student': student,
+            'parent': parent,
         }
         return render(request, 'ewallet/checkout.html', context)
 
@@ -327,6 +324,8 @@ def updateItem(request):
     return JsonResponse('Item was added', safe=False)
 
 # Pay w Paypal at checkout
+
+
 @login_required(login_url='/login/')
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
@@ -341,20 +340,21 @@ def processOrder(request):
     if total == order.get_cart_total:
         order.complete = True
     order.save()
-    
+
     return JsonResponse('Payment Complete', safe=False)
 
 # Pay w MyWallet at checkout
+
+
 @login_required(login_url='/login/')
 def processTransaction(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
 
     parent = request.user.parent
-    p_wallet = parent.parentwallet
-    p_wallet.balance -= float(data['form']['amount'])
-    p_wallet.save()
-    student = Student.objects.get(id=data['form']['student'])
+    parent.wallet_balance -= float(data['form']['amount'])
+    parent.save()
+    student = Student.objects.get(student_id=data['form']['student'])
 
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False)
@@ -367,9 +367,9 @@ def processTransaction(request):
 
     Transaction.objects.create(
         parent=parent,
-        student=student,         
+        student=student,
         transaction_id=transaction_id,
-        timestamp=datetime.datetime.now(),
+        date=datetime.datetime.now(),
         transaction_type='Payment',
         description='e-Store',
         amount=data['form']['amount'],
@@ -383,14 +383,13 @@ def processTopup(request):
     data = json.loads(request.body)
 
     parent = request.user.parent
-    p_wallet = parent.parentwallet
-    p_wallet.balance += float(data['form']['amount'])
-    p_wallet.save()
+    parent.wallet_balance += float(data['form']['amount'])
+    parent.save()
 
     Transaction.objects.create(
         parent=parent,
         transaction_id=transaction_id,
-        timestamp=datetime.datetime.now(),
+        date=datetime.datetime.now(),
         transaction_type='Deposit',
         description='Online',
         amount=data['form']['amount'],
@@ -404,22 +403,19 @@ def processReload(request):
     data = json.loads(request.body)
 
     parent = request.user.parent
-    p_wallet = parent.parentwallet
-    s_wallet = StudentWallet.objects.get(id=data['form']['s_wallet'])
+    student = Student.objects.get(student_id=data['form']['student'])
 
-    print(type(p_wallet.balance))
-
-    if (p_wallet.balance > 0.0):
-        p_wallet.balance -= float(data['form']['amount'])
-        p_wallet.save()
-        s_wallet.balance += float(data['form']['amount'])
-        s_wallet.save()
+    if (parent.wallet_balance > 0.0):
+        parent.wallet_balance -= float(data['form']['amount'])
+        parent.save()
+        student.wallet_balance += float(data['form']['amount'])
+        student.save()
 
         Transaction.objects.create(
             parent=parent,
-            s_wallet=s_wallet,
+            student=student,
             transaction_id=transaction_id,
-            timestamp=datetime.datetime.now(),
+            date=datetime.datetime.now(),
             transaction_type='Transfer',
             description='Reload',
             amount=data['form']['amount'],

@@ -15,10 +15,15 @@ class TransactionFilter(django_filters.FilterSet):
 class StudentFilter(django_filters.FilterSet):    
     class Meta:
         model = Student
-        fields = ('classgroup', 'batch', 'student_id')
+        fields = ('class_name', 'student_id')
 
 class ProductFilter(django_filters.FilterSet):
     # less = NumberFilter(field_name="quantity", lookup_expr='lte')    
     class Meta:
         model = Product
         fields = ('name', 'quantity')
+
+class CardFilter(django_filters.FilterSet):
+    class Meta:
+        model = Student
+        fields = ('card_id',)    

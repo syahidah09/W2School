@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from ewallet.models import Student, ParentWallet, StudentWallet, Transaction, Parent
+from ewallet.models import *
 
 class StudentForm(ModelForm):
     class Meta:
@@ -43,6 +43,7 @@ class StudentForm(ModelForm):
         # return any errors if found
         return self.cleaned_data
 
+    
 class CreateUserForm(UserCreationForm):
 	class Meta:
 		model = User
@@ -72,7 +73,7 @@ class TransferForm(ModelForm):
 class ReloadForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ('s_wallet', 'amount',)
+        fields = ('student', 'amount',)
     
     def clean(self):
  
@@ -94,4 +95,9 @@ class TransactionForm(ModelForm):
     class Meta:
         model = Transaction
         fields = ('student',)
+
+class ParentForm(ModelForm):
+    class Meta:
+        model = Parent
+        fields = ('name', 'email', 'phone')
         

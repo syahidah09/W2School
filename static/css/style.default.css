@@ -290,6 +290,7 @@ thead, tbody, tfoot, tr, td, th {
   border-color: inherit;
   border-style: solid;
   border-width: 0;
+  text-align: center;
 }
 
 label {
@@ -12388,7 +12389,7 @@ nav.side-navbar.shrinked .sidebar-header .title {
 
 .sidebar-item li a {
   padding-left: 50px;
-  background: #EEF5F9;
+  background: #459c48;
 }
 
 .sidebar-item.active>.sidebar-link {
@@ -12398,17 +12399,17 @@ nav.side-navbar.shrinked .sidebar-header .title {
 }
 
 .sidebar-item.active>.sidebar-link:hover {
-  background: #796AEE;
+  background: #6ec071;
 }
 
 .sidebar-item li.active>.sidebar-link {
   color: #fff;
   border-left: 4px solid #3b25e6;
-  background: #8e81f1;
+  background: #6ec071;
 }
 
 .sidebar-item .collapse {
-  background: #EEF5F9;
+  background: #6ec071;
 }
 
 .sidebar-link {
@@ -12445,7 +12446,7 @@ nav.side-navbar.shrinked .sidebar-header .title {
 .sidebar-link:hover {
   color: #fff;
   border-left: 4px solid #3b25e6;
-  background: #796AEE;
+  background: #6ec071;
 }
 
 .sidebar-link[data-bs-toggle="collapse"]::before {
@@ -12479,7 +12480,7 @@ nav.side-navbar.shrinked .sidebar-header .title {
 }
 
 .sidebar-link[aria-expanded="true"], .sidebar-link[aria-expanded="aria-expanded"] {
-  background: #EEF5F9;
+  background: #6ec071;
 }
 
 .sidebar-link[aria-expanded="true"]::before, .sidebar-link[aria-expanded="aria-expanded"]::before {
@@ -12496,7 +12497,7 @@ nav.side-navbar.shrinked .sidebar-header .title {
 
 .sidebar-link[aria-expanded="true"]:hover, .sidebar-link[aria-expanded="aria-expanded"]:hover {
   color: #fff;
-  background: #796AEE;
+  background: #6ec071;
 }
 
 .sidebar-link .badge {
@@ -12960,7 +12961,7 @@ nav.navbar .search-box form input {
 }
 
 .login-page .info {
-  background: rgba(121, 106, 238, 0.9);
+  background: #00766a;
   color: #fff;
 }
 
