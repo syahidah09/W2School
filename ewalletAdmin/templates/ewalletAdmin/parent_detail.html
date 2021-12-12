@@ -11,7 +11,7 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 justify-content-between align-items-center">
-                <h2 class="my-0">Parent Detail</h2>
+                <h2 class="my-0">Parent Detail</h2>               
                 <!-- <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewalletAdmin:student-create' %}">Add New Student</a> -->
             </div>
         </div>
@@ -22,24 +22,65 @@
 <section class="pb-0 pt-3">
     <div class="container-fluid">
         <div class="row gy-4">
-            <div class="col-lg-2 form-label">
+            <div class="col-lg-2">
 
+                <p><strong>ID:</strong></p>
                 <p><strong>Name:</strong></p>
                 <p><strong>Phone:</strong> </p>
-                <p><strong>Email:</strong> </p>
-                
+                <p><strong>Email:</strong> </p><br>
+                <p><strong>Student List:</strong> </p>
+
             </div>
-            <div class="col-lg-3">                
-                <p><a href="{{ parent.id.get_absolute_url }}">{{ parent.name }}</a>
+            <div class="col-lg-3">
+                <p><a href="{{ parent.id.get_absolute_url }}">{{ parent.id }}</a>
                 </p>
+                <p>{{ parent.name }}</p>
                 <p>{{ parent.phone }}</p>
                 <p>{{ parent.email }}</p>
-                
+
+            </div>
+        </div>
+
+        <!-- Parent's child list-->
+        <div class="row gy-4">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-responsive table-bordered mb-0 align-middle" style="text-align: center">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;"></th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        {% if student %}
+                        {% for student in student %}
+                        <tbody>
+                            <tr>
+                                <td><a class="btn btn-sm btn-secondary"
+                                       href="{{ student.get_absolute_url }}">View</a></td>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.classgroup }}</td>
+                                <td style="width: 25%;">
+                                    <a class="btn btn-sm btn-info" href="{{ student.get_update }}">Update</a>
+                                    <a class="btn btn-sm btn-danger"
+                                       href="{{ student.confirm_delete }}">Delete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        {% endfor %}
+                        {% else %}
+                        <p>There are no students for this parent yet.</p>
+                        {% endif %}
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </section>
-
 
 
 {% endblock %}

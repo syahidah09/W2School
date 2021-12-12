@@ -11,7 +11,9 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 justify-content-between align-items-center">
-                <h2 class="my-0">Parent List</h2>                
+                <h2 class="my-0">Parent List</h2>        
+                <a class="btn w3-theme-d4 rounded-pill" type="button"
+                    href="{% url 'ewalletAdmin:parent-create' %}">Add New Parent</a>        
             </div>
         </div>
     </div>
@@ -28,7 +30,8 @@
                         <div class="table-responsive">
                             <table class="table mb-0 align-middle" style="text-align: center">
                                 <thead>
-                                    <tr>                                        
+                                    <tr>      
+                                        <th style="width: 10%;"></th>                                  
                                         <th>Name</th>
                                         <th>Phone</th>                                        
                                         <th>Email</th>
@@ -39,11 +42,12 @@
                                 {% for parent in parent_list %}
                                 <tbody>
                                     <tr>
-                                        <td><a href="{{ parent.get_absolute_url }}">{{ parent.name }}</a></td>
+                                        <td><a class="btn btn-sm btn-secondary" href="{{ parent.get_absolute_url }}">View</a></td>
+                                        <td>{{ parent.name }}</td>
                                         <td>{{ parent.phone }}</td>
                                         <td>{{ parent.email }}</td>                                        
                                         <td>
-                                            <!-- <a class="btn btn-sm btn-info" href="{{ parent.get_update }}">Update</a> -->
+                                            <a class="btn btn-sm btn-info" href="{{ parent.get_update }}">Update</a>
                                             <a class="btn btn-sm btn-danger"
                                                 href="{{ parent.confirm_delete }}">Delete</a>
                                         </td>
