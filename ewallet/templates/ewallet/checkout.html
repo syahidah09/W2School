@@ -23,60 +23,35 @@
     <div class="container-fluid">
         <!-- Cart item -->
         <div class="row gy-4">
-            <div class="col-lg-6">
+            <div class="d-flex flex-column col-lg-6">
                 <div class="card card-body mb-0" id="form-wrapper">
                     <h3>Order Summary</h3>
                     <hr>
                     {% for item in items %}
-                    <div class="cart-row">
-                        <!-- <div style="flex:2"><img class="row-image img-fluid" src="{{item.product.imageURL }}"></div> -->
-                        <div style="flex:2">
-                            <p>{{item.product.name}}</p>
-                        </div>
-                        <div style="flex:1">
-                            <p>RM{{item.product.price|floatformat:2}}</p>
-                        </div>
-                        <div style="flex:1">
-                            <p>x{{item.quantity}}</p>
-                        </div>
+                    <div class="row">
+                        <div class="col-6">{{item.product.name}}</div>
+                        <div class="col-3">x{{item.quantity}}</div>
+                        <div class="col-3 align-content-end">RM{{item.product.price|floatformat:2}}</div>
                     </div>
                     {% endfor %}
-                    <h5>Items: {{order.get_cart_items}}</h5>
-                    <h5>Total: RM{{order.get_cart_total|floatformat:2}}</h5>
-                    <br>
-                    <form id="form">
-                        <div id="shipping-info">
-                            <h5>Shipping Information:</h5>
-                            <hr>
-                            <div class="form-field">
-                                <input class="form-control" type="text" name="address" placeholder="Address..">
-                            </div>
-                            <div class="form-field">
-                                <input class="form-control" type="text" name="city" placeholder="City..">
-                            </div>
-                            <div class="form-field">
-                                <input class="form-control" type="text" name="state" placeholder="State..">
-                            </div>
-                            <div class="form-field">
-                                <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
-                            </div>
-                        </div>
-                        <hr>
-                        <!-- <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue"> -->
-                    </form>
+                    <hr>
+                    <div class="row">
+                        <div class="col-3 offset-5">Items: {{order.get_cart_items}}</div>
+                        <div class="col-4">Total: RM{{order.get_cart_total|floatformat:2}}</div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="card card-body mb-0" id="payment-info">
-                    <h5>Payment Methods:</h5>
+                    <h3>Payment Methods</h3>
                     <hr>
                     <form id="wallet" method="POST">
                         {% csrf_token %}
                         <div class="col" id="reload-info">
                             <div class="input-group mb-3">
-                                <span class="input-group-text" for="id_s_wallet">Student</span>
+                                <span class="input-group-text" for="id_student">Student</span>
                                 {{form.student}}
-                            </div>                            
+                            </div>
                         </div>
                         <input class="btn w3-theme-d4 rounded-pill w-100" type="submit" value="MyWallet">
                     </form>
@@ -138,10 +113,11 @@
         e.preventDefault()
         console.log('MyWallet button clicked')
 
-        var pw = '{{ pw.balance }}'
+        var pw = '{{ parent.wallet_balance }}'
+        console.log('MyWallet balance: ', pw)
         if (total > parseInt(pw)) {
             alert('Not enough balance. Please topup.');
-            window.location.href = "{% url 'ewallet:checkout' %}"
+            window.location.href = "{% url 'ewallet:topup' %}"
         } else {
             submitFormData2()
         }
@@ -157,19 +133,7 @@
             'name': null,
             'email': null,
             'total': total,
-        }
-
-        var shippingInfo = {
-            'address': null,
-            'city': null,
-            'state': null,
-            'zipcode': null,
-        }
-
-        shippingInfo.address = form.address.value
-        shippingInfo.city = form.city.value
-        shippingInfo.state = form.state.value
-        shippingInfo.zipcode = form.zipcode.value
+        }       
 
         var url = '/process_order/'
         //post request
@@ -179,7 +143,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken,
             },
-            body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo })
+            body: JSON.stringify({ 'form': userFormData})
         })
 
             //promise, turn the data to json value
@@ -193,9 +157,7 @@
     }
 
     //  Pay w MyWallet
-    function submitFormData2() {
-        console.log('Payment btn clicked')
-
+    function submitFormData2() {       
         var FormData = {
             'student': form.student.value,
             'amount': total,
@@ -222,7 +184,7 @@
     }
 </script>
 <script type="text/javascript">
-    document.getElementById('id_student').classList.add("form-select");   
+    document.getElementById('id_student').classList.add("form-select");
 </script>
 
 {% endblock %}

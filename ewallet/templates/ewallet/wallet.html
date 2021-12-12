@@ -19,9 +19,7 @@
                     data-bs-target="#myModal">Reload
                     Child</button> -->
                 <a class="btn w3-theme-d4 rounded-pill me-2" type="button" href="{% url 'ewallet:reload' %}">
-                    Reload</a>
-                <a class="btn w3-theme-d4 rounded-pill" type="button" href="{% url 'ewallet:add_dependent' %}">Add New
-                    Dependent</a>
+                    Reload</a>                
             </div>
         </div>
     </div>
@@ -37,18 +35,18 @@
                         <h3 class="h4 mb-0">My Wallet</h3>
                     </div>
                     <div class="card-body">
-                        <p>RM {{ pwb|floatformat:2 }}</p>
+                        <p>RM {{ parent.wallet_balance|floatformat:2 }}</p>
                     </div>
                 </div>
             </div>
-            {% for s_wallet in sw %}
+            {% for s in student %}
             <div class="col">
                 <div class="card bg-light mb-1 border-primary text-center rounded">
                     <div class="card-header">
-                        <h3 class="h4 mb-0">{{ s_wallet.student.name }}</h3>
+                        <h3 class="h4 mb-0">{{ s.name }}</h3>
                     </div>
                     <div class="card-body ">
-                        <p>RM {{ s_wallet.balance|floatformat:2 }}</p>
+                        <p>RM {{ s.wallet_balance|floatformat:2 }}</p>
                     </div>
                 </div>
             </div>
@@ -56,7 +54,7 @@
 
             <!-- Modal-->
             <div class="modal fade text-start" id="myModal" tabindex="-1" aria-labelledby="myModalLabel"
-                aria-hidden="true">
+                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -85,7 +83,7 @@
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">RM</span>
                                         <input type="number" class="form-control"
-                                            aria-label="Dollar amount (with dot and two decimal places)">
+                                               aria-label="Dollar amount (with dot and two decimal places)">
                                     </div>
                                 </div>
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -101,7 +99,7 @@
 
             <!-- Modal-->
             <div class="modal fade text-start" id="myModal" tabindex="-1" aria-labelledby="myModalLabel"
-                aria-hidden="true">
+                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -119,7 +117,7 @@
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">RM</span>
                                         <input type="number" class="form-control"
-                                            aria-label="Dollar amount (with dot and two decimal places)">
+                                               aria-label="Dollar amount (with dot and two decimal places)">
                                     </div>
                                 </div>
                                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -133,133 +131,5 @@
         </div>
     </div>
 </section>
-<hr>
-
-<section class="pb-0 pt-3 mb-3">
-    <div class="container-fluid ">
-        <div class="row gy-4">
-            <div class="col-6 " id="payment-info">
-                <div class="card card-body bg-light hidden">
-                    <div id="paypal-button-container"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<script
-    src="https://www.paypal.com/sdk/js?client-id=ATvu8CSqUjeq9VUVDlMKHVlCAhDK03kjG2qfYo5R-agqBKtW6pVilFYb4iMXcYJvF4Em087pHYplvkhg&currency=MYR"></script>
-<script>
-    var total = '12'
-    // Render the PayPal button into #paypal-button-container
-    paypal.Buttons({
-
-        style: {
-            color: 'blue',
-            shape: 'pill',
-            label: 'paypal',
-            height: 35,
-            tagline: false
-        },
-
-        // Set up the transaction
-        createOrder: function (data, actions) {
-            return actions.order.create({
-                // This function sets up the details of the transaction, including the amount and line item details.
-                purchase_units: [{
-                    amount: {
-                        value: parseFloat(total).toFixed(2)
-                    }
-                }]
-            });
-        },
-
-        // Finalize the transaction
-        onApprove: function (data, actions) {
-            // This function captures the funds from the transaction.
-            return actions.order.capture().then(function (details) {
-                // This function shows a transaction success message to your buyer.
-                alert('Transaction completed by ' + details.payer.name.given_name + ', Email: ' + details.payer.email_address + ', Amount topup: ' + details.purchase_units.amount);
-                // + ', Email: ' + details.payer.email_address + ', Amount topup: ' + details.purchase_units.amount
-                submitFormData()
-                // Show a success message to the buyer
-
-            });
-        }
-
-
-    }).render('#paypal-button-container');
-</script>
-
-<script type="text/javascript">
-    // var shipping = '{{order.shipping}}'
-
-    // if (shipping == 'False') {
-    //     document.getElementById('shipping-info').innerHTML = ''
-    // }
-
-    var form = document.getElementById('form')
-    form.addEventListener('submit', function (e) {
-        e.preventDefault()
-        console.log('Form Submitted...')
-        document.getElementById('form-button').classList.add("hidden");
-        document.getElementById('payment-info').classList.remove("hidden");
-    })
-
-    /*
-    document.getElementById('make-payment').addEventListener('click', function(e){
-        submitFormData()
-    })
-    */
-
-    function submitFormData() {
-        console.log('Payment button clicked')
-
-        var userFormData = {
-            'name': null,
-            'email': null,
-            'total': total,
-        }
-
-        var shippingInfo = {
-            'address': null,
-            'city': null,
-            'state': null,
-            'zipcode': null,
-        }
-
-        if (shipping != 'False') {
-            shippingInfo.address = form.address.value
-            shippingInfo.city = form.city.value
-            shippingInfo.state = form.state.value
-            shippingInfo.zipcode = form.zipcode.value
-        }
-
-        console.log('Shipping Info:', shippingInfo)
-        console.log('User Info:', userFormData)
-
-        var url = "/process_order/"
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'applicaiton/json',
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo }),
-
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Success:', data);
-                alert('Transaction completed');
-
-                cart = {}
-                document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
-
-                window.location.href = "{% url 'ewallet:wallet' %}"
-
-            })
-    }
-</script>
 
 {% endblock %}

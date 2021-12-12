@@ -20,28 +20,25 @@
 <section class="pb-0 pt-3">
   <div class="container-fluid">
     <!-- Filter Transactions -->
-    <div class="row gy-4">
+    <div class="row gy-4">      
       <div class="col-lg-12">
-        <div class="card mb-0">
-          <div class="card-body">
-            <form action="" method="get">
-              <div class="row gy-2">
-                <div class="col-sm-2">
-                  <h4>Filter</h4>
-                </div>
+        <div class="card card-body mb-0">          
+          <form action="" method="get">
+            <div class="row gy-2">
+              <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h4>Filter</h4>
                 {% for filter in myFilter.form %}
-                <label class="col-sm-2 form-label" for="{{ filter.id_for_label }}">{{ filter.label_tag }}</label>
-                <div class="col-sm-2">
-                  {{ filter }}
-                </div>
+                {{ filter.label_tag }}
+                {{ filter }}
                 {% endfor %}
-                <button class="col-sm-2 btn btn-primary btn-sm" type="submit">Search</button>
+                <button class="col-sm-2 btn btn-primary btn-sm" type="submit">Apply</button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div><br>
+
     <!-- Transactions -->
     <div class="row gy-4">
       <div class="col-lg-12">
@@ -63,11 +60,11 @@
                 <tbody>
                   <tr>
                     <th scope="row">{{ transaction.transaction_id }}</th>
-                    <th>{{ transaction.parent }}, {{ transaction.s_wallet }}</th>
+                    <th>{{ transaction.parent }}, {{ transaction.student }}</th>
                     <td>{{ transaction.transaction_type }}</td>
                     <td>{{ transaction.description }}</td>
                     <td>{{ transaction.amount|floatformat:2 }}</td>
-                    <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                    <td>{{ transaction.date|date:'d/m/Y' }}</td>
                   </tr>
                 </tbody>
                 {% endfor %}
