@@ -30,6 +30,7 @@
             </div>
             <div class="col-sm-8">
                 {{ field }}
+                {{ field.errors }}
             </div>
         </div>
 
@@ -47,10 +48,11 @@
 <script type="text/javascript">
     document.getElementById('id_student_id').classList.add("form-control");
     document.getElementById('id_name').classList.add("form-control");
-    document.getElementById('id_classgroup').classList.add("form-control");
-    document.getElementById('id_batch').classList.add("form-control");
+    document.getElementById('id_class_name').classList.add("form-select");
+    document.getElementById('id_parent').classList.add("form-select");    
     document.getElementById('id_card_id').classList.add("form-control");
-    document.getElementById('id_parent').classList.add("form-select");
+    document.getElementById('id_wallet_balance').setAttribute("disabled", "disabled");
+    
 </script>
 
 {% endblock %}

@@ -28,13 +28,14 @@
                 <div class="card mb-0">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-bordered mb-0 align-middle" style="text-align: center">
+                            <table class="table table-responsive table-bordered mb-0 align-middle" style="text-align: center">
                                 <thead>
                                     <tr>
                                         <th style="width: 10%;"></th>
                                         <th>Student ID</th>
                                         <th>Name</th>
-                                        <th>Class</th>                                        
+                                        <th>Class</th>          
+                                        <th>Card No</th>                              
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -46,7 +47,8 @@
                                             href="{{ student.get_absolute_url }}">View</a></td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.name }}</td>
-                                        <td>{{ student.classgroup }}</td>                                        
+                                        <td>{{ student.class_name }}</td>       
+                                        <td>{{ student.card_id }}</td>                                 
                                         <td>                                            
                                             <a class="btn btn-sm btn-info" href="{{ student.get_update }}">Update</a>
                                             <a class="btn btn-sm btn-danger"
