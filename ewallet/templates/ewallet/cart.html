@@ -39,7 +39,7 @@
                                         <th>Item</th>
                                         <th>Price</th>
                                         <th>Quantity</th>
-                                        <th>Add/Remove</th>
+                                        <th style="width: 5%;">Add/Subtract</th>
                                         <th>Total Price</th>
                                     </tr>
                                 </thead>
@@ -49,17 +49,14 @@
                                         <td>{{ item.product.name }}</td>
                                         <td>{{ item.product.price|floatformat:2 }}</td>
                                         <td class="quantity ">
-                                            {{ item.quantity }}
+                                            {{ item.quantity }}</td>
                                         <td><a class="chg-quantity update-cart" data-product={{item.product.id}}
                                                 data-action="add" href=""><i class="fas fa-caret-up fa-2x"
                                                     aria-hidden="true"></i></a>
                                             <a class="chg-quantity update-cart" data-product={{item.product.id}}
                                                 data-action="remove" href=""><i class="fas fa-caret-down fa-2x"
                                                     aria-hidden="true"></i></a>
-                                        </td>
-
-
-                                        </td>
+                                        </td>         
                                         <td>{{ item.get_total|floatformat:2 }}</td>
                                     </tr>
                                 </tbody>
