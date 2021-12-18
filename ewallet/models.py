@@ -5,10 +5,8 @@ from django.contrib.auth.models import User
 
 class Parent(models.Model):
     user = models.OneToOneField(
-        User, null=True, blank=True, on_delete=models.SET_NULL)
-    name = models.CharField(max_length=200, null=True)
-    phone = models.CharField(max_length=200, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
+        User, null=True, blank=True, on_delete=models.SET_NULL)    
+    phone = models.CharField(max_length=200, null=True, blank=True)    
     wallet_balance = models.FloatField(default=0)
 
     def get_absolute_url(self):
@@ -27,10 +25,7 @@ class Parent(models.Model):
         return reverse('ewalletAdmin:parent-delete', args=[str(self.id)])
 
     def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['name']
+        return f"{self.user.first_name} {self.user.last_name}"  
 
 
 class Student(models.Model):
@@ -48,12 +43,13 @@ class Student(models.Model):
     ]
 
     student_id   = models.IntegerField(primary_key=True)
-    name         = models.CharField(max_length=200, null=True)
+    first_name = models.CharField(max_length=200, null=True)
+    last_name = models.CharField(max_length=200, null=True)
     class_name   = models.CharField(
                  max_length=10, choices=CLASS_NAME, default='1A')
     parent       = models.ForeignKey(
                 Parent, null=True, blank=True, on_delete=models.SET_NULL)
-    card_id     = models.CharField(max_length=10, unique=True)
+    card_id     = models.CharField(max_length=10, unique=True, null=True, blank=True,)
     wallet_balance = models.FloatField(default=0)
 
     def get_absolute_url(self):
@@ -66,7 +62,7 @@ class Student(models.Model):
         return reverse('ewalletAdmin:student-delete', args=[str(self.student_id)])
 
     def __str__(self):
-        return f"{self.student_id} {self.name}"
+        return f"{self.first_name} {self.last_name}"
 
     class Meta:
         ordering = ['student_id']
@@ -75,6 +71,7 @@ class Student(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
     price = models.FloatField()
+    category = models.CharField(max_length=200, null=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
 

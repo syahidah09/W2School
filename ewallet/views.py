@@ -41,17 +41,14 @@ def registerPage(request):
         # check whether it's valid:
         if form.is_valid():
             user = form.save()
-            username = form.cleaned_data.get('username')
-            email = form.cleaned_data.get('email')
+            username = form.cleaned_data.get('username')            
 
             group, created = Group.objects.get_or_create(name='parent')
             print("Group id: " + str(group))
             user.groups.add(group)
 
             Parent.objects.create(
-                user=user,
-                name=user.username,
-                email=email,
+                user=user,                
             )
 
             messages.success(
@@ -87,33 +84,43 @@ def logoutUser(request):
 
 @login_required(login_url='/login/')
 def user_detail(request):
-    parent = request.user.parent
+    user = request.user
+    parent = user.parent
     context = {
-        'parent': parent
+        'parent': parent,
+        'user': user
     }
     return render(request, "ewallet/user_detail.html", context)
 
 
 @login_required(login_url='/login/')
 def user_update(request):
-    parent = request.user.parent
+    user = request.user
+    parent = user.parent
     parent_form = ParentForm(instance=parent)
+    user_from = UserForm(instance=user)
 
     if request.method == 'POST':
         parent_form = ParentForm(request.POST, instance=parent)
+        user_from = UserForm(request.POST, instance=user)
         if parent_form.is_valid():
             parent_form.save()
+            user_from.save()
             return redirect('/user_profile/')
 
     context = {
-        'parent_form': parent_form
-    }
+        'parent_form': parent_form,
+        'user_from': user_from
+    } 
     return render(request, "ewallet/user_form.html", context)
 
 
 @login_required(login_url='/login/')
 def homepage(request):
     user = request.user
+    parent = user.parent
+    student = parent.student_set.all()
+    transactions = user.parent.transaction_set.all()[:5]
 
     if not user.groups.filter(name="parent"):
         print("User " + user.username + " is NOT in a group parent")
@@ -121,11 +128,8 @@ def homepage(request):
         logout(request)
         return redirect('/')
 
-    parent = user.parent
-    student = parent.student_set.all()
-    transactions = user.parent.transaction_set.all()[:5]
-
     context = {
+        'user': user,
         'parent': parent,
         'student': student,
         'transactions': transactions,
@@ -135,10 +139,12 @@ def homepage(request):
 
 @login_required(login_url='/login/')
 def wallet_page(request):
-    parent = request.user.parent
+    user = request.user
+    parent = user.parent
     student = parent.student_set.all()
 
     context = {
+        'user': user,
         'parent': parent,
         'student': student,
     }

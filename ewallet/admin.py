@@ -15,14 +15,14 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Parent)
 class ParentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email')
-    search_fields = ('name', 'email')
+    list_display = ('phone',)
+    search_fields = ('phone',)
 
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('student_id', 'name')
-    search_fields = ('student_id', 'name')
+    list_display = ('student_id', 'first_name')
+    search_fields = ('student_id', 'first_name')
 
 
 @admin.register(Transaction)

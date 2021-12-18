@@ -47,7 +47,7 @@ class StudentForm(ModelForm):
 class CreateUserForm(UserCreationForm):
 	class Meta:
 		model = User
-		fields = ['username', 'email', 'password1', 'password2']
+		fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
 class TransferForm(ModelForm):
     class Meta:
@@ -96,8 +96,12 @@ class TransactionForm(ModelForm):
         model = Transaction
         fields = ('student',)
 
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')
 class ParentForm(ModelForm):
     class Meta:
         model = Parent
-        fields = ('name', 'email', 'phone')
+        fields = ('phone',)
         
