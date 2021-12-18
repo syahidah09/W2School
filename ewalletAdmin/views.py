@@ -104,13 +104,7 @@ def StudentCreateView2(request):
         form = StudentForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            form.save()
-
-            StudentWallet.objects.create(
-                student=Student.objects.get(
-                    student_id=request.POST.get('student_id')),
-                parent=Parent.objects.get(id=request.POST.get('parent')),
-            )
+            form.save()          
 
             return redirect('/admin2/students/')
         else:

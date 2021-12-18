@@ -1,3 +1,4 @@
+from django.http import response
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -8,6 +9,13 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, UpdateView
 from django.core.paginator import Paginator, EmptyPage
 
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.units import cm
+from reportlab.lib.colors import *
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from io import BytesIO
+
 
 from .models import *
 from .forms import *
@@ -15,6 +23,7 @@ from .filters import *
 from .decorators import *
 import datetime
 import json
+import os
 
 
 @unauthenticated_user
@@ -66,7 +75,7 @@ def loginPage(request):
             return redirect('/home/')
         else:
             messages.info(request, 'Username OR password is incorrect')
-            
+
     context = {}
     return render(request, "ewallet/login.html", context)
 
@@ -208,9 +217,8 @@ def reload(request):
 @login_required(login_url='/login/')
 def transaction_history(request, page=1):
     transactions = request.user.parent.transaction_set.all()
-    paginator = Paginator(transactions, 8)  # 10 transactions per page
-
-    print(request.user.parent.student_set.all())
+    paginator = Paginator(transactions, 10)  # 10 transactions per page
+    
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
 
@@ -222,9 +230,23 @@ def transaction_history(request, page=1):
 
     context = {
         'transactions': transactions,
-        'myFilter': myFilter,
+        'myFilter': myFilter,        
     }
     return render(request, "ewallet/transaction_list.html", context)
+
+
+def TransactionDetail(request, pk):
+    tr = Transaction.objects.get(id=pk)
+
+    items = None
+    if tr.order is not None:
+        items = tr.order.orderitem_set.all()    
+
+    context = {
+        'transaction': tr,
+        'items': items,
+    }
+    return render(request, "ewallet/transaction_detail.html", context)
 
 
 @login_required(login_url='/login/')
@@ -357,12 +379,13 @@ def processTransaction(request):
     student = Student.objects.get(student_id=data['form']['student'])
 
     order, created = Order.objects.get_or_create(
-        parent=parent, complete=False)
-    total = float(data['form']['total'])
-    order.transaction_id = transaction_id
+        parent=parent,
+        student=student,
+        complete=True)  # temp True
+    total = float(data['form']['total'])   # total is null here
 
     if total == order.get_cart_total:
-        order.complete = True
+        order.complete = True  # not set to true after payment w mywallet on checkout page
     order.save()
 
     Transaction.objects.create(
@@ -373,6 +396,7 @@ def processTransaction(request):
         transaction_type='Payment',
         description='e-Store',
         amount=data['form']['amount'],
+        order=order
     )
     return JsonResponse('Payment Complete', safe=False)
 
@@ -424,3 +448,116 @@ def processReload(request):
 
     else:
         return JsonResponse('Not enough balance', safe=False)
+
+# refered https://medium.com/@saijalshakya/generating-pdf-with-reportlab-in-django-ee0235c2f133 & https://eric.sau.pe/reportlab-and-django-part-1-the-set-up-and-a-basic-example
+def download_receipt(request, pk):
+    transactions = Transaction.objects.get(id=pk)    
+    items = transactions.order.orderitem_set.all()
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="receipt.pdf"'
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4))
+
+    styles = getSampleStyleSheet()
+    story = []
+
+    # Title
+    styleT = styles['Title']
+    story.append(Paragraph("Invoice/Receipt", styleT))
+    space = Spacer(cm, 0.8*cm)
+
+    # Build structure
+    InvoiceTable = Table([
+        ["Invoice No.", ":",  transactions.transaction_id],
+        ["Invoice Date", ":", transactions.date.strftime("%d/%m/%Y")]
+    ], [60, 10, 150])
+
+    DetailTable = Table([
+        ["Name", ":",  transactions.parent],
+        ["Description", ":", transactions.description]
+    ], [60, 10, 150])
+
+    InvoiceDetailTable = Table([
+        [InvoiceTable, DetailTable],
+    ])
+
+    data=[["No.", "Product", "Quantity", "Unit Price (RM)", "Total (RM)"],]
+    count=0
+    for i in items:
+        count+=1        
+        data.append([
+            count, i.product, i.quantity,
+                "{:.2f}".format(i.product.price), "{:.2f}".format(i.get_total),
+                ])    
+    ProdcuctTable = Table(data, [60, 400, 60, 80, 60])    
+
+    ElemTable = Table([
+        [InvoiceDetailTable],
+        [space],
+        [ProdcuctTable],
+    ])
+
+    # Paragraph
+    TotalStyle = ParagraphStyle(
+        name='Normal',
+        alignment=2,
+        spaceAfter=6,
+        spaceBefore=6,
+        rightIndent=20
+    )
+
+    NoteStyle = styles['BodyText']
+    NoteStyle.textColor = gray
+    NoteStyle.leftIndent = 10
+    OrgStyle = styles['Heading5']
+    OrgStyle.alignment = 1
+
+    Total = Paragraph(text =("Total: RM %.2f"% (transactions.order.get_cart_total)), style=TotalStyle)
+
+    Note = Paragraph(''' 
+        Note: This receipt is computer generated and no signature is required
+    ''', NoteStyle)
+
+    Org = Paragraph(''' 
+        Wallet2School
+    ''', OrgStyle)
+
+    # Add table style
+    InvoiceTableStyle = TableStyle(
+        [
+            ("TEXTCOLOR", (0, 0), (0, 2), darkblue),
+        ]
+    )
+    InvoiceTable.setStyle(InvoiceTableStyle)
+    DetailTable.setStyle(InvoiceTableStyle)
+
+    ProdcuctTableStyle = TableStyle(
+        [
+            ("BOX", (0, 0), (-1, -1), 1, black),
+            ("GRID", (0, 0), (4, 4), 1, black),
+            ("BACKGROUND", (0, 0), (4, 0), cornflowerblue),
+            ("TEXTCOLOR", (0, 0), (-1, 0), black),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("BACKGROUND", (0, 1), (-1, -1), lightcyan),
+        ]
+    )
+    ProdcuctTable.setStyle(ProdcuctTableStyle)
+
+    ElemTable2 = Table([
+        [ElemTable],
+        [Total],
+        [space],
+        [Note],
+        [space],
+        [Org]
+    ])
+
+    story.append(ElemTable2)
+    doc.build(story)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response

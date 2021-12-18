@@ -18,26 +18,36 @@
 <section class="pb-0 pt-3">
     <div class="container-fluid">
         <div class="row gy-3">
-            <div class="col-lg-6">
+            <div class="col-lg">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Total Students</h3>
+                        <h3 class="h4 mb-0" style="text-align: center">Total Sales</h3>
                     </div>
                     <div class="card-body">
                         <h1 style="text-align: center;padding: 5px">{{ students.count }}</h1>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Total Registered Parent</h3>
+                        <h3 class="h4 mb-0" style="text-align: center">Total Transactions</h3>
                     </div>
                     <div class="card-body">
                         <h1 style="text-align: center;padding: 5px">{{ parents.count }}</h1>
                     </div>
                 </div>
-            </div>      
+            </div>     
+            <div class="col-lg">
+                <div class="card bg-light mb-1 border-dark">
+                    <div class="card-header">
+                        <h3 class="h4 mb-0" style="text-align: center">Students</h3>
+                    </div>
+                    <div class="card-body">
+                        <h1 style="text-align: center;padding: 5px">{{ students.count }}</h1>
+                    </div>
+                </div>
+            </div>                    
         </div>
     </div>
 </section>

@@ -39,6 +39,12 @@ class Student(models.Model):
         ('1B', '1B'),
         ('2A', '2A'),
         ('2B', '2B'),
+        ('3A', '3A'),
+        ('3B', '3B'),
+        ('4A', '4A'),
+        ('4B', '4B'),
+        ('5A', '5A'),
+        ('5B', '5B'),
     ]
 
     student_id   = models.IntegerField(primary_key=True)
@@ -133,6 +139,9 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return str(self.product.name)
+
     @property
     def get_total(self):
         total = self.product.price * self.quantity
@@ -177,6 +186,9 @@ class Transaction(models.Model):
 
     def confirm_delete(self):
         return reverse('ewalletAdmin:transaction-delete', args=[str(self.id)])
+
+    def get_absolute_url2(self):
+        return reverse('ewallet:transaction-detail', args=[str(self.id)])
 
     def __str__(self):
         return str(self.id)

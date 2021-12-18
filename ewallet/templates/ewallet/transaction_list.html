@@ -10,7 +10,7 @@
   <div class="container-fluid px-0">
     <div class="row gy-4">
       <div class="d-flex mb-0 justify-content-between align-items-center">
-        <h2 class="my-0">Transaction History</h2>
+        <h2 class="my-0">Transaction History</h2>        
       </div>
     </div>
   </div>
@@ -48,23 +48,34 @@
               <table class="table mb-0 align-middle" style="text-align: center">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th></th>
+                    <th>Date</th>
                     <th>Payer</th>
                     <th>Transaction Type</th>
                     <th>Description</th>
-                    <th>Amount</th>
-                    <th>Date</th>
+                    <th>Amount</th>  
+                    <th></th>
                   </tr>
                 </thead>
                 {% for transaction in transactions %}
                 <tbody>
                   <tr>
-                    <th scope="row">{{ transaction.transaction_id }}</th>
-                    <th>{{ transaction.parent }}, {{ transaction.student }}</th>
+                    <td><a class="btn btn-sm btn-secondary" href="{{ transaction.get_absolute_url2 }}">View</a></td>
+                    <td>{{ transaction.date|date:'d/m/Y' }}</td>
+                    {% if transaction.parent is not None %}
+                    <td>{{ transaction.parent }}</td>
+                    {% else %}
+                    <td>{{ transaction.student }}</td>
+                    {% endif %}
                     <td>{{ transaction.transaction_type }}</td>
                     <td>{{ transaction.description }}</td>
-                    <td>{{ transaction.amount|floatformat:2 }}</td>
-                    <td>{{ transaction.date|date:'d/m/Y' }}</td>
+                    <td>{{ transaction.amount|floatformat:2 }}</td>  
+                    {% if transaction.transaction_type == 'Payment' and transaction.order is not None %} 
+                    <td>
+                      <a href="{% url 'ewallet:download_receipt' transaction.id %}" class="btn btn-sm btn-success">Download Receipt</a>                      
+                    {% else %}
+                    <td><button class="btn btn-sm btn-secondary">Receipt Unavailable</button></td> 
+                    {% endif %}                            
                   </tr>
                 </tbody>
                 {% endfor %}
@@ -140,5 +151,5 @@
   </div>
 </section>
 
-
 {% endblock %}
+

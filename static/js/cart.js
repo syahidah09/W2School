@@ -12,7 +12,7 @@ for (var i = 0; i < updateButtons.length; i++) {
 }
 
 function updateUserOrder(productId, action) {
-    console.log('User is logged in, sending data...')
+    console.log('sending data...')
 
     var url = '/update_item/'
     //post request
