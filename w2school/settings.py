@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'account',
 
     'django_filters',
+    'widget_tweaks',   
     'rest_framework',
 ]
 
@@ -82,8 +83,10 @@ WSGI_APPLICATION = 'w2school.wsgi.application'
 
 DATABASES = {
     'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': 'mydatabase',
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Demo_test',
+        'NAME': 'w2school',
         'USER': 'postgres',
         'PASSWORD': 'syida.99',
         'HOST': 'localhost',
@@ -135,7 +138,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")    
 ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "static/images")
-MEDIA_URL = '/images/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "static/img")
+MEDIA_URL = '/img/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

@@ -1,0 +1,116 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %} Reload {% endblock %}
+
+{% block content %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 align-items-center">
+                <a class="me-3" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <h2 class="me-auto my-0">Reload</h2>
+            </div>
+        </div>
+    </div>
+</header>
+
+{% for message in messages %}
+<div class="toast hide top-0 start-50 translate-middle-x" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <!-- <img src="..." class="rounded me-2" alt="..."> -->
+        <!-- <strong class="me-auto">Bootstrap</strong> -->
+        <!-- <small>11 mins ago</small> -->
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        <p>{{message}}</p>
+    </div>
+</div>
+{% endfor %}
+
+<section class="pb-0 pt-3 mb-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <p class="mb-0">How much do you want to reload? Your current balance <strong>RM{{ parent.wallet_balance|floatformat:2 }}</strong></p>
+            <form id="form" class="form-horizontal" method="POST" action="">
+                {% csrf_token %}
+                <div class="col-sm-4" id="reload-info">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" for="id_student">Student</span>
+                        {{form.student}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">RM</span>
+                        <input type="number" name="amount" step="any" required="" id="id_amount" class="form-control" placeholder="Enter amount">
+                    </div>
+                </div>
+                <a class="btn btn-secondary" type="button" href="{% url 'ewallet:wallet' %}">Cancel</a>
+                <button class="btn btn-primary" type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block js_scripts %}
+<!-- Paypal js -->
+<script type="text/javascript">
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form Submitted...')
+        console.log('Continue button clicked')
+        console.log('Student: ', form.student.value)
+        console.log('Amount: ', form.amount.value)
+
+        var reloadamount = form.amount.value
+        var pw = '{{ parent.wallet_balance }}'
+        if (reloadamount > parseInt(pw)) {
+            console.log('Reload amount is bigger than wallet balance')
+            alert('Not enough balance. Please topup.');
+            window.location.href = "{% url 'ewallet:topup' %}"
+        } else if (reloadamount == 0) {
+            alert('Invalid amount. Minimum amount is RM1.');
+        } else {
+            submitFormData()
+        }
+
+    })
+
+    function submitFormData() {
+        console.log('Payment btn clicked')
+
+        var reloadFormData = {
+            'student': form.student.value,
+            'amount': form.amount.value,
+        }
+
+        var url = "/process_reload/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': reloadFormData })
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewallet:wallet' %}"
+            })
+    }
+
+</script>
+
+<script type="text/javascript">
+    document.getElementById('id_student').classList.add("form-select");
+    document.getElementById('id_amount').classList.add("form-control");
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'partials/base.html' %}
+
+{% block title %} Wallet {% endblock %}
+
+{% block content %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 align-items-center">
+                <h2 class="me-auto  my-0">Wallets</h2>
+                <!-- <button class="btn w3-theme-d4 rounded-pill me-2" type="button" data-bs-toggle="modal" data-bs-target="#myModal"> Top Up </button> -->
+                <a class="btn w3-theme-d4 rounded-pill me-2" type="button" href="{% url 'ewallet:topup' %}">
+                    Top Up</a>
+                <!-- <button class="btn w3-theme-d4 rounded-pill me-2" type="button" data-bs-toggle="modal"
+                    data-bs-target="#myModal">Reload
+                    Child</button> -->
+                <a class="btn w3-theme-d4 rounded-pill me-2" type="button" href="{% url 'ewallet:reload' %}">
+                    Reload</a>                
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3 mb-3">
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <div class="col">
+                <div class="card bg-light mb-1 border-primary text-center rounded">
+                    <div class="card-header">
+                        <h3 class="h4 mb-0">My Wallet</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>RM {{ parent.wallet_balance|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% for s in student %}
+            <div class="col">
+                <div class="card bg-light mb-1 border-primary text-center rounded">
+                    <div class="card-header">
+                        <h3 class="h4 mb-0">{{ s.first_name }}</h3>
+                    </div>
+                    <div class="card-body ">
+                        <p>RM {{ s.wallet_balance|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}           
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

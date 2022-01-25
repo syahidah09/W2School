@@ -1,0 +1,158 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %} Topup {% endblock %}
+
+{% block content %}
+
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 align-items-center">
+                <a class="me-3" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <h2 class="me-auto my-0">Top Up</h2>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!--
+<div class="col-lg-6">    
+    <div class="form-group">
+    <label for="inputAmount">Top Up Amount</label>
+    <input type="text" id="inputAmount" class="form-control" aria-describedby="amountHelpBlock">
+    <small id="amountHelpBlock" class="text-muted">
+        Minimum amount RM 10
+    </small>
+    </div>    
+</div>-->
+
+<section class="pb-0 pt-3 mb-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <div class="col-6 alert alert-warning alert-dismissible fade show visually-hidden mb-0" role="alert" id="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Invalid amount.</strong> Please enter atleast RM10 or more.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <p class="mb-0">How much do you want to transfer?</p>
+            <form id="form" class="form-horizontal" method="POST" action="">
+                {% csrf_token %}
+                <div class="col-sm-4" id="topup-info">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">RM</span>
+                        <input type="number" name="amount" id="id_amount" class="form-control"
+                               placeholder="Minimum value RM10">
+                    </div>
+                </div>
+                <a class="btn btn-secondary" type="button" href="{% url 'ewallet:wallet' %}">Cancel</a>
+                <button class="btn btn-primary" type="submit">Continue</button>
+            </form>
+        </div><br>
+        <div class="row gy-4 ">
+            <div class="col-6 " id="payment-info">
+                <div id="paypal-button-container" class="card visually-hidden p-2">
+                    <h4>Payment Methods</h4>
+                </div>
+                <script>paypal.Buttons().render('body');</script>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block js_scripts %}
+<script
+        src="https://www.paypal.com/sdk/js?client-id=AURot8ufuq-IKkz-RLrTvoc0Pqa3-MeeU_Cl9qqr6OThmmrw8MiBha-utTlNc1XZZkRJu4SwJ4Gk5MLT&currency=MYR"></script>
+
+<script type="text/javascript">
+    var inputamount = 0
+    var form = document.getElementById('form')
+    form.addEventListener('submit', function (e) {
+        e.preventDefault()
+        console.log('Form Submitted...')
+        // document.getElementById('paypal-button-container').classList.remove("hidden");
+        console.log('Continue button clicked')
+        console.log('Amount: ', form.amount.value)
+        inputamount = form.amount.value // set input from form
+
+        if (form.amount.value == 0) {
+            console.log('Invalid amount')
+            document.getElementById('alert').classList.remove("visually-hidden");
+            // alert('Invalid amount');
+        } else {
+            document.getElementById('paypal-button-container').classList.remove("visually-hidden");
+            document.getElementById('paypal-button-container').classList.add("scale-up-top");
+            // Render the PayPal button into #paypal-button-container
+            paypal.Buttons({
+
+                style: {
+                    color: 'blue',
+                    shape: 'pill',
+                    label: 'paypal',
+                    height: 35,
+                    tagline: false
+                },
+
+                // Set up the transaction
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        // This function sets up the details of the transaction, including the amount and line item details.
+                        purchase_units: [{
+                            amount: {
+                                value: parseFloat(inputamount).toFixed(2)
+                            }
+                        }]
+                    });
+                },
+
+                // Finalize the transaction
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        submitFormData()
+                        // Show a success message to the buyer
+                    });
+                }
+
+
+            }).render('#paypal-button-container');
+        }
+
+    })
+
+    function submitFormData() {
+        console.log('Payment btn clicked')
+
+        var amountFormData = {
+            'amount': inputamount,
+        }
+
+        amountFormData.amount = form.amount.value
+
+        // console.log('Shipping Info:', shippingInfo)
+        // console.log('User Info:', userFormData)
+
+        var url = "/process_topup/"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ 'form': amountFormData })
+
+
+        })
+
+            //promise, turn the data to json value
+            .then((response) => response.json())
+
+            .then((data) => {
+                console.log('Success:', data); //jsonresponse from views.py
+                alert('Transaction Completed!');
+                window.location.href = "{% url 'ewallet:wallet' %}"
+            })
+    }
+</script>
+{% endblock %}

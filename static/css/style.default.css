@@ -31,7 +31,7 @@ https://bootstrapious.com/p/admin-template
   --bs-white: #fff;
   --bs-gray: #6c757d;
   --bs-gray-dark: #343a40;
-  --bs-primary: #796AEE;
+  --bs-primary: goldenrod;
   --bs-secondary: #6c757d;
   --bs-success: #28a745;
   --bs-info: #17a2b8;
@@ -45,7 +45,7 @@ https://bootstrapious.com/p/admin-template
   --bs-yellow: #eef157;
   --bs-faintGreen: #54e69d;
   --bs-orange: #ffc36d;
-  --bs-violet: #796AEE;
+  --bs-violet: goldenrod;
   --bs-paleBlue: #85b4f2;
   --bs-font-sans-serif: "Poppins", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -202,12 +202,12 @@ sup {
 }
 
 a {
-  color: #796AEE;
+  color: goldenrod;
   text-decoration: underline;
 }
 
 a:hover {
-  color: #3b25e6;
+  color: #001eff;
 }
 
 a:not([href]):not([class]), a:not([href]):not([class]):hover {
@@ -2483,8 +2483,8 @@ textarea.form-control-lg {
 }
 
 .form-check-input:checked {
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .form-check-input:checked[type="checkbox"] {
@@ -2496,8 +2496,8 @@ textarea.form-control-lg {
 }
 
 .form-check-input[type="checkbox"]:indeterminate {
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/%3e%3c/svg%3e");
 }
 
@@ -2591,7 +2591,7 @@ textarea.form-control-lg {
   width: 1rem;
   height: 1rem;
   margin-top: -0.25rem;
-  background-color: #796AEE;
+  background-color: goldenrod;
   border: 0;
   border-radius: 1rem;
   -webkit-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
@@ -2626,7 +2626,7 @@ textarea.form-control-lg {
 .form-range::-moz-range-thumb {
   width: 1rem;
   height: 1rem;
-  background-color: #796AEE;
+  background-color: goldenrod;
   border: 0;
   border-radius: 1rem;
   -moz-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -3069,8 +3069,8 @@ textarea.form-control-lg {
 
 .btn-primary {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-primary:hover {
@@ -3100,8 +3100,8 @@ textarea.form-control-lg {
 
 .btn-primary:disabled, .btn-primary.disabled {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-secondary {
@@ -3587,8 +3587,8 @@ textarea.form-control-lg {
 
 .btn-violet {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-violet:hover {
@@ -3618,8 +3618,8 @@ textarea.form-control-lg {
 
 .btn-violet:disabled, .btn-violet.disabled {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-paleBlue {
@@ -3660,14 +3660,14 @@ textarea.form-control-lg {
 }
 
 .btn-outline-primary {
-  color: #796AEE;
-  border-color: #796AEE;
+  color: #000;
+  border-color: #00dcc6;
 }
 
 .btn-outline-primary:hover {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: #00dcc6;
+  border-color: #00dcc6;
 }
 
 .btn-check:focus+.btn-outline-primary, .btn-outline-primary:focus {
@@ -3677,8 +3677,8 @@ textarea.form-control-lg {
 
 .btn-check:checked+.btn-outline-primary, .btn-check:active+.btn-outline-primary, .btn-outline-primary:active, .btn-outline-primary.active, .btn-outline-primary.dropdown-toggle.show {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: #00dcc6;
+  border-color: #00dcc6;
 }
 
 .btn-check:checked+.btn-outline-primary:focus, .btn-check:active+.btn-outline-primary:focus, .btn-outline-primary:active:focus, .btn-outline-primary.active:focus, .btn-outline-primary.dropdown-toggle.show:focus {
@@ -3687,7 +3687,7 @@ textarea.form-control-lg {
 }
 
 .btn-outline-primary:disabled, .btn-outline-primary.disabled {
-  color: #796AEE;
+  color: goldenrod;
   background-color: transparent;
 }
 
@@ -4108,14 +4108,14 @@ textarea.form-control-lg {
 }
 
 .btn-outline-violet {
-  color: #796AEE;
-  border-color: #796AEE;
+  color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-outline-violet:hover {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-check:focus+.btn-outline-violet, .btn-outline-violet:focus {
@@ -4125,8 +4125,8 @@ textarea.form-control-lg {
 
 .btn-check:checked+.btn-outline-violet, .btn-check:active+.btn-outline-violet, .btn-outline-violet:active, .btn-outline-violet.active, .btn-outline-violet.dropdown-toggle.show {
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .btn-check:checked+.btn-outline-violet:focus, .btn-check:active+.btn-outline-violet:focus, .btn-outline-violet:active:focus, .btn-outline-violet.active:focus, .btn-outline-violet.dropdown-toggle.show:focus {
@@ -4135,7 +4135,7 @@ textarea.form-control-lg {
 }
 
 .btn-outline-violet:disabled, .btn-outline-violet.disabled {
-  color: #796AEE;
+  color: goldenrod;
   background-color: transparent;
 }
 
@@ -4173,7 +4173,7 @@ textarea.form-control-lg {
 
 .btn-link {
   font-weight: 400;
-  color: #796AEE;
+  color: goldenrod;
   text-decoration: underline;
 }
 
@@ -4675,7 +4675,7 @@ textarea.form-control-lg {
 .nav-link {
   display: block;
   padding: 0.5rem 1rem;
-  color: #796AEE;
+  color: goldenrod;
   text-decoration: none;
   -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
@@ -4741,7 +4741,7 @@ textarea.form-control-lg {
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
   color: #fff;
-  background-color: #796AEE;
+  background-color: goldenrod;
 }
 
 .nav-fill>.nav-link, .nav-fill .nav-item {
@@ -5552,7 +5552,7 @@ textarea.form-control-lg {
 .page-link {
   position: relative;
   display: block;
-  color: #796AEE;
+  color: goldenrod;
   text-decoration: none;
   background-color: #fff;
   border: 1px solid #dee2e6;
@@ -5592,8 +5592,8 @@ textarea.form-control-lg {
 .page-item.active .page-link {
   z-index: 3;
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .page-item.disabled .page-link {
@@ -5895,7 +5895,7 @@ textarea.form-control-lg {
   color: #fff;
   text-align: center;
   white-space: nowrap;
-  background-color: #796AEE;
+  background-color: goldenrod;
   -webkit-transition: width 0.6s ease;
   transition: width 0.6s ease;
 }
@@ -5994,8 +5994,8 @@ textarea.form-control-lg {
 .list-group-item.active {
   z-index: 2;
   color: #fff;
-  background-color: #796AEE;
-  border-color: #796AEE;
+  background-color: goldenrod;
+  border-color: goldenrod;
 }
 
 .list-group-item+.list-group-item {
@@ -7566,7 +7566,7 @@ textarea.form-control-lg {
 }
 
 .link-primary {
-  color: #796AEE;
+  color: goldenrod;
 }
 
 .link-primary:hover, .link-primary:focus {
@@ -7678,7 +7678,7 @@ textarea.form-control-lg {
 }
 
 .link-violet {
-  color: #796AEE;
+  color: goldenrod;
 }
 
 .link-violet:hover, .link-violet:focus {
@@ -8058,7 +8058,7 @@ textarea.form-control-lg {
 }
 
 .border-primary {
-  border-color: #796AEE !important;
+  border-color: goldenrod !important;
 }
 
 .border-secondary {
@@ -8114,7 +8114,7 @@ textarea.form-control-lg {
 }
 
 .border-violet {
-  border-color: #796AEE !important;
+  border-color: goldenrod !important;
 }
 
 .border-paleBlue {
@@ -8993,7 +8993,7 @@ textarea.form-control-lg {
 /* rtl:end:remove */
 
 .text-primary {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 .text-secondary {
@@ -9049,7 +9049,7 @@ textarea.form-control-lg {
 }
 
 .text-violet {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 .text-paleBlue {
@@ -9081,7 +9081,7 @@ textarea.form-control-lg {
 }
 
 .bg-primary {
-  background-color: #796AEE !important;
+  background-color: goldenrod !important;
 }
 
 .bg-secondary {
@@ -9137,7 +9137,7 @@ textarea.form-control-lg {
 }
 
 .bg-violet {
-  background-color: #796AEE !important;
+  background-color: goldenrod !important;
 }
 
 .bg-paleBlue {
@@ -12291,7 +12291,7 @@ button, input {
 
 .card-close .dropdown-menu a:hover {
   color: #fff !important;
-  background: #796AEE;
+  background: goldenrod;
 }
 
 .card-close .dropdown-menu a i {
@@ -12383,9 +12383,9 @@ nav.side-navbar.shrinked .sidebar-header .title {
   display: none;
 }
 
-.sidebar-item {
+/* .sidebar-item { */
   /* submenu item active */
-}
+/* } */
 
 .sidebar-item li a {
   padding-left: 50px;
@@ -12395,7 +12395,7 @@ nav.side-navbar.shrinked .sidebar-header .title {
 .sidebar-item.active>.sidebar-link {
   color: #fff;
   border-left: 4px solid #3b25e6;
-  background: #796AEE;
+  background: goldenrod;
 }
 
 .sidebar-item.active>.sidebar-link:hover {
@@ -12728,9 +12728,9 @@ nav.navbar .search-box form input {
 /* MAIN NAVBAR MEDIAQUERIES ----------------------------------- */
 
 @media (max-width: 991.98px) {
-  nav.navbar {
+  /* nav.navbar { */
     /*==== Toggle Sidebar Btn ====*/
-  }
+  /* } */
   nav.navbar .menu-btn {
     margin-right: 20px;
     -webkit-transition: all 0.7s;
@@ -12913,7 +12913,7 @@ nav.navbar .search-box form input {
   top: 0;
   -webkit-transform: scale(0.85);
   transform: scale(0.85);
-  color: #796AEE;
+  color: goldenrod;
 }
 
 .js-validate-error-label {
@@ -13275,7 +13275,7 @@ nav.navbar .search-box form input {
 }
 
 .text-hover-primary:focus, .text-hover-primary:hover {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 a.text-hover-primary {
@@ -13284,7 +13284,7 @@ a.text-hover-primary {
 }
 
 a.text-hover-primary:focus, a.text-hover-primary:hover {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 .bg-primary-light {
@@ -13292,7 +13292,7 @@ a.text-hover-primary:focus, a.text-hover-primary:hover {
 }
 
 .border-primary {
-  border-color: #796AEE !important;
+  border-color: goldenrod !important;
 }
 
 .text-hover-secondary {
@@ -13639,7 +13639,7 @@ a.text-hover-orange:focus, a.text-hover-orange:hover {
 }
 
 .text-hover-violet:focus, .text-hover-violet:hover {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 a.text-hover-violet {
@@ -13648,7 +13648,7 @@ a.text-hover-violet {
 }
 
 a.text-hover-violet:focus, a.text-hover-violet:hover {
-  color: #796AEE !important;
+  color: goldenrod !important;
 }
 
 .bg-violet-light {
@@ -13656,7 +13656,7 @@ a.text-hover-violet:focus, a.text-hover-violet:hover {
 }
 
 .border-violet {
-  border-color: #796AEE !important;
+  border-color: goldenrod !important;
 }
 
 .text-hover-paleBlue {
@@ -13794,7 +13794,7 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 }
 
 .badge-primary-light {
-  color: #796AEE;
+  color: goldenrod;
   background-color: theme-color-level("primary", -11);
 }
 
@@ -13864,7 +13864,7 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 }
 
 .badge-violet-light {
-  color: #796AEE;
+  color: goldenrod;
   background-color: theme-color-level("violet", -11);
 }
 
@@ -14350,7 +14350,7 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 
 .bg-violet {
   color: #fff;
-  background: #796AEE;
+  background: goldenrod;
 }
 
 .bg-violet:hover {
@@ -14358,11 +14358,11 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 }
 
 .text-violet {
-  color: #796AEE;
+  color: goldenrod;
 }
 
 .text-violet:hover {
-  color: #796AEE;
+  color: goldenrod;
 }
 
 .bg-blue {
@@ -14497,7 +14497,7 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 }
 
 .avatar-primary-light {
-  color: #796AEE;
+  color: goldenrod;
   background-color: #e4e1fc;
 }
 
@@ -14567,7 +14567,7 @@ a.text-hover-paleBlue:focus, a.text-hover-paleBlue:hover {
 }
 
 .avatar-violet-light {
-  color: #796AEE;
+  color: goldenrod;
   background-color: #e4e1fc;
 }
 

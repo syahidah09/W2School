@@ -1,17 +1,49 @@
 from django.db.models import fields
-import django_filters 
-from django_filters import DateFilter
+from django_filters import *
 
 from .models import *
 
-class TransactionFilter(django_filters.FilterSet):
-    # start_date = DateFilter(field_name="timestamp", lookup_expr='gte')
-    # end_date = DateFilter(field_name="timestamp", lookup_expr='lte')
+TRANSACTION_TYPES = [
+    ('Deposit', 'Deposit'),
+    ('Transfer', 'Transfer'),
+    ('Payment', 'Payment'),
+    ('Scan & Pay', 'Scan & Pay'),
+]
+
+DESCRIPTION = [
+    ('Online', 'Online'),
+    ('Reload', 'Reload'),
+    ('Canteen', 'Canteen'),
+    ('Co-op', 'Co-op'),
+    ('e-Store', 'e-Store'),
+    ('School Fee', 'School Fee'),
+]
+class TransactionFilter(FilterSet):
+    date = DateFromToRangeFilter(label='Date Range')
+    transaction_type = ChoiceFilter(choices=TRANSACTION_TYPES)
+    description = ChoiceFilter(choices=DESCRIPTION)
+
     class Meta:
         model = Transaction
-        fields = ('transaction_type', 'description' )
+        fields = ('date', 'transaction_type', 'description')
 
-class StudenttFilter(django_filters.FilterSet):   
+class StudenttFilter(FilterSet):   
     class Meta:
         model = Student
         fields = ('student_id',)
+
+CATEGORIES = [
+    ("School Items", "School Items"),
+    ("Stationery", "Stationery"),
+    ("Workbook", "Workbook"),
+    ("Food & Drinks", "Food & Drinks"),
+]
+
+
+class ProductFilter(FilterSet):
+    name = CharFilter(lookup_expr='icontains',label='Name')
+    category = ChoiceFilter(choices=CATEGORIES)    
+
+    class Meta:
+        model = Product
+        fields = ['name', 'category', ]

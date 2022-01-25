@@ -1,0 +1,46 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %} Student Detail {% endblock %}
+
+{% block content %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <a class="me-3" href="{% url 'ewalletAdmin:students' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <h2 class="me-auto my-0">Student Detail</h2>
+                
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <div class="row gy-4">
+            <div class="col-lg-2 form-label">
+                <p><strong>Name:</strong></p>
+                <p><strong>ID:</strong> </p>
+                <p><strong>Classgroup:</strong></p>                
+                <p><strong>Card ID:</strong> </p>
+                <p><strong>Parent:</strong> </p>
+                
+            </div>
+            <div class="col-lg-3">
+                <p>{{ student.first_name }} {{ student.last_name }}</p>
+                <p><a href="{{ student.student_id.get_absolute_url }}">{{ student.student_id }}</a>
+                </p>
+                <p>{{ student.class_name }}</p>                
+                <p>{{ student.card_id }}</p>
+                <p>{{ student.parent.user.first_name }} {{ student.parent.user.last_name }}</p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}

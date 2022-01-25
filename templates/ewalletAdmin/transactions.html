@@ -1,0 +1,97 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block title %} Transaction History {% endblock %}
+
+{% block content %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+  <div class="container-fluid px-0">
+    <div class="row gy-4">
+      <div class="col-lg-10">
+        <h2 class="mb-0 p-1">Transactions </h2>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+  <div class="container-fluid">
+    <div class="row gy-4">
+      <!-- Filter -->
+      <div class="col-lg-12">
+        <div class="card mb-0">
+          <div class="card-body">
+            <form action="" method="get">
+              <div class="row gy-2">
+                <div class="col-sm-2">
+                  <h4>Filter</h4>
+                </div>
+                {% for filter in myFilter.form %}
+                <label class="col-sm-2 form-label" for="{{ filter.id_for_label }}">{{ filter.label_tag }}</label>
+                <div class="col-sm-2">
+                  {{ filter }}
+                </div>
+                {% endfor %}
+                <button class="col-sm-2 btn btn-primary btn-sm" type="submit">Search</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div><br>
+    <div class="row gy-4">
+      <!-- Recent Transactions -->
+      <div class="col-lg-12">
+        <div class="card mb-0">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table mb-0" style="text-align: center">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Transaction Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                {% for transaction in transactions %}
+                <tbody>
+                  <tr>
+                    <th scope="row">{{ transaction.transaction_id }}</th>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ transaction.amount|floatformat:2 }}</td>
+                    <td>{{ transaction.timestamp|date:'d/m/Y' }}</td>
+                  </tr>
+                </tbody>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><br>
+    <nav aria-label="...">
+      <ul class="pagination pagination-sm">
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item" aria-current="page">
+          <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+
+</section>
+
+
+{% endblock %}

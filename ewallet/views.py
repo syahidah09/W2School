@@ -1,35 +1,36 @@
-from django.http import response
-from django.http.response import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
-from django.contrib import messages
-from django.views.generic import ListView, DetailView, UpdateView
-from django.core.paginator import Paginator, EmptyPage
-
-from reportlab.lib.pagesizes import landscape, A4
-from reportlab.lib.units import cm
-from reportlab.lib.colors import *
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+import json
+import os,math
+from datetime import date, datetime, timedelta
 from io import BytesIO
 
+import pytz
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
+from django.core.paginator import EmptyPage, Paginator
+from django.http import response
+from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, ListView, UpdateView
+from reportlab.lib.colors import *
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import (Paragraph, SimpleDocTemplate, Spacer, Table,
+                                TableStyle)
 
-from .models import *
-from .forms import *
-from .filters import *
 from .decorators import *
-import datetime
-import json
-import os
+from .filters import *
+from .forms import *
+from .models import *
 
 
 @unauthenticated_user
 def frontPage(request):
     context = {}
-    return render(request, "ewallet/frontpage.html", context)
+    return render(request, "partials/frontpage.html", context)
 
 
 @unauthenticated_user
@@ -41,14 +42,14 @@ def registerPage(request):
         # check whether it's valid:
         if form.is_valid():
             user = form.save()
-            username = form.cleaned_data.get('username')            
+            username = form.cleaned_data.get('username')
 
             group, created = Group.objects.get_or_create(name='parent')
             print("Group id: " + str(group))
             user.groups.add(group)
 
             Parent.objects.create(
-                user=user,                
+                user=user,
             )
 
             messages.success(
@@ -79,7 +80,7 @@ def loginPage(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect('/login/')
+    return redirect('/')
 
 
 @login_required(login_url='/login/')
@@ -92,13 +93,15 @@ def user_detail(request):
     }
     return render(request, "ewallet/user_detail.html", context)
 
-
+MY = pytz.timezone('Asia/Kuala_Lumpur')
+today = datetime.now(MY)
+date = "2022-01-18 18:44:12.726799+08:00"
 @login_required(login_url='/login/')
 def user_update(request):
     user = request.user
     parent = user.parent
     parent_form = ParentForm(instance=parent)
-    user_from = UserForm(instance=user)
+    user_form = UserForm(instance=user)
 
     if request.method == 'POST':
         parent_form = ParentForm(request.POST, instance=parent)
@@ -110,29 +113,40 @@ def user_update(request):
 
     context = {
         'parent_form': parent_form,
-        'user_from': user_from
-    } 
+        'user_form': user_form
+    }
     return render(request, "ewallet/user_form.html", context)
 
 
 @login_required(login_url='/login/')
 def homepage(request):
-    user = request.user
-    parent = user.parent
+    parent = request.user.parent
     student = parent.student_set.all()
-    transactions = user.parent.transaction_set.all()[:5]
-
-    if not user.groups.filter(name="parent"):
-        print("User " + user.username + " is NOT in a group parent")
-        messages.info(request, 'You need to login with a non-admin account')
-        logout(request)
-        return redirect('/')
+    transaction = parent.transaction_set.all()[:5]    
+    tr=[]
+    for i in parent.transaction_set.all()[:3]:
+        tr.append(i)
+        for j in student:
+            for k in j.transaction_set.all()[:3]:
+                tr.append(k)
+    for i in tr[:5]:
+        print(i.description)
+    ltr=[]
+    for i in student:
+        s=[]
+        amount=0        
+        s.append(i.first_name)        
+        tr=i.transaction_set.filter(date__month=today.month)
+        for j in tr:
+            amount+=j.amount
+        s.append(math.ceil(amount))
+        ltr.append(s)        
 
     context = {
-        'user': user,
         'parent': parent,
         'student': student,
-        'transactions': transactions,
+        'transaction': tr[:5],
+        'ltr':ltr,
     }
     return render(request, "ewallet/home.html", context)
 
@@ -148,40 +162,22 @@ def wallet_page(request):
         'parent': parent,
         'student': student,
     }
-
     return render(request, "ewallet/wallet.html", context)
 
 
 @login_required(login_url='/login/')
 def topup_page(request):
 
-    if request.method == 'POST':
-
-        # Pass the form data to the form class
-        details = TransferForm(request.POST)
-
-        # In the 'form' class the clean function
-        # is defined, if all the data is correct
-        # as per the clean function, it returns true
-        if details.is_valid():
-
-            # Temporarily make an object to be add some
-            # logic into the data if there is such a need
-            # before writing to the database
-            post = details.save(commit=False)
-
-            # Finally write the changes into database
+    if request.method == 'POST':        
+        details = TransferForm(request.POST)       
+        if details.is_valid():            
+            post = details.save(commit=False)            
             post.save()
             return HttpResponse("data submitted successfully")
-
         else:
-            return HttpResponse("data invalid")
-        # return redirect('/topup/')
-    else:
+            return HttpResponse("data invalid")        
 
-        # If the request is a GET request then,
-        # create an empty form object and
-        # render it into the page
+    else:    
         form = TransferForm(None)
         context = {'form': form}
         return render(request, "ewallet/topup.html", context)
@@ -192,29 +188,26 @@ def reload(request):
     user = request.user
     parent = user.parent
     student = parent.student_set.all()
-
     myOption = StudenttFilter(request.GET, queryset=student)
     s = myOption.qs
 
     if request.method == 'POST':
         details = ReloadForm(request.POST)
-
         if details.is_valid():
             post = details.save(commit=False)
             post.save()
             return HttpResponse("data submitted successfully")
-
         else:
             return HttpResponse("data invalid")
 
     else:
-        form = ReloadForm(None)
-        # filter only this user's child
+        form = ReloadForm(None)       
         form.fields["student"].queryset = student
 
         context = {
             'form': form,
             'myOption': myOption,
+            'parent': parent,
             's': s,
         }
         return render(request, "ewallet/reload.html", context)
@@ -224,102 +217,52 @@ def reload(request):
 def transaction_history(request, page=1):
     transactions = request.user.parent.transaction_set.all()
     paginator = Paginator(transactions, 10)  # 10 transactions per page
-    
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
 
     try:
         transactions = paginator.page(page)
-    except EmptyPage:
-        # if we exceed the page limit we return the last page
+    except EmptyPage:       
         transactions = paginator.page(paginator.num_pages)
 
     context = {
         'transactions': transactions,
-        'myFilter': myFilter,        
+        'filter': myFilter,
     }
     return render(request, "ewallet/transaction_list.html", context)
 
 
-def TransactionDetail(request, pk):
+@login_required(login_url='/login/')
+def transaction_detail(request, pk):
     tr = Transaction.objects.get(id=pk)
 
-    items = None
+    item = None
     if tr.order is not None:
-        items = tr.order.orderitem_set.all()    
+        item = tr.order.orderitem_set.all()
+        print(tr.order.id)
+    print(item)
 
     context = {
         'transaction': tr,
-        'items': items,
+        'item': item,
     }
     return render(request, "ewallet/transaction_detail.html", context)
-
 
 @login_required(login_url='/login/')
 def store(request):
     parent = request.user.parent
     order, created = Order.objects.get_or_create(
-        parent=parent, complete=False)
-    cartItems = order.get_cart_items
-
+        parent=parent, complete=False, date_ordered=date)
+    cartItems = order.get_cart_items   
     products = Product.objects.all()
+    myFilter = ProductFilter(request.GET, queryset=products)   
+
     context = {
         'products': products,
-        'cartItems': cartItems
+        'cartItems': cartItems,
+        'filter': myFilter,
     }
     return render(request, "ewallet/store.html", context)
-
-
-@login_required(login_url='/login/')
-def cart(request):
-    parent = request.user.parent
-    order = Order.objects.get(
-        parent=parent, complete=False)
-    items = order.orderitem_set.all()
-    cartItems = order.get_cart_items
-
-    context = {
-        'items': items,
-        'order': order,
-        'cartItems': cartItems
-    }
-    return render(request, 'ewallet/cart.html', context)
-
-
-@login_required(login_url='/login/')
-def checkout(request):
-    parent = request.user.parent
-    student = parent.student_set.all()
-
-    order = Order.objects.get(
-        parent=parent, complete=False)
-    items = order.orderitem_set.all()
-    cartItems = order.get_cart_items
-
-    if request.method == 'POST':
-        details = TransactionForm(request.POST)
-
-        if details.is_valid():
-            post = details.save(commit=False)
-            post.save()
-            return HttpResponse("data submitted successfully")
-
-        else:
-            return HttpResponse("data invalid")
-
-    else:
-        form = TransactionForm(None)
-        form.fields["student"].queryset = student
-
-        context = {
-            'form': form,
-            'items': items,
-            'order': order,
-            'cartItems': cartItems,
-            'student': student,
-            'parent': parent,
-        }
-        return render(request, 'ewallet/checkout.html', context)
 
 
 @login_required(login_url='/login/')
@@ -328,16 +271,18 @@ def updateItem(request):
     productId = data['productId']
     action = data['action']
 
-    print('Action:', action)
-    print('productId:', productId)
+    # print('Action:', action)
+    # print('productId:', productId)
 
     parent = request.user.parent
     product = Product.objects.get(id=productId)
     order, created = Order.objects.get_or_create(
-        parent=parent, complete=False)
+        parent=parent, complete=False, date_ordered=date)
 
     orderItem, created = OrderItem.objects.get_or_create(
-        order=order, product=product)
+        order=order, product=product,date_added=date)
+
+    # print("[updateitem] Order ID: ", order.id)
 
     if action == 'add':
         orderItem.quantity = (orderItem.quantity + 1)
@@ -350,6 +295,57 @@ def updateItem(request):
         orderItem.delete()
 
     return JsonResponse('Item was added', safe=False)
+
+
+@login_required(login_url='/login/')
+def cart(request):
+    parent = request.user.parent
+    order = Order.objects.get(
+        parent=parent, complete=False, date_ordered=date)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
+   
+    context = {
+        'items': items,
+        'order': order,
+        'cartItems': cartItems
+    }
+    return render(request, 'ewallet/cart.html', context)
+
+
+@login_required(login_url='/login/')
+def checkout(request):
+    parent = request.user.parent
+    student = parent.student_set.all()
+    order = Order.objects.get(
+        parent=parent, complete=False,date_ordered=date)
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
+   
+    if request.method == 'POST':
+        details = TransactionForm(request.POST)      
+        if details.is_valid():
+            post = details.save(commit=False)
+            order.student = Student.objects.get(
+                student_id=request.POST.get('student'))
+            post.save()
+            return HttpResponse("data submitted successfully")
+        else:
+            return HttpResponse("data invalid")
+
+    else:
+        form = TransactionForm(None)
+        form.fields["student"].queryset = student        
+
+        context = {
+            'form': form,
+            'items': items,
+            'order': order,
+            'cartItems': cartItems,            
+            'parent': parent,
+        }
+        return render(request, 'ewallet/checkout.html', context)
+
 
 # Pay w Paypal at checkout
 
@@ -364,9 +360,10 @@ def processOrder(request):
         parent=parent, complete=False)
     total = float(data['form']['total'])
     order.transaction_id = transaction_id
-
+    # print("[processorder] Order ID: ", order.id)
     if total == order.get_cart_total:
         order.complete = True
+
     order.save()
 
     return JsonResponse('Payment Complete', safe=False)
@@ -383,15 +380,17 @@ def processTransaction(request):
     parent.wallet_balance -= float(data['form']['amount'])
     parent.save()
     student = Student.objects.get(student_id=data['form']['student'])
-
-    order, created = Order.objects.get_or_create(
+    # print(student)
+    order = Order.objects.get(
         parent=parent,
-        student=student,
-        complete=True)  # temp True
+        complete=False)  # temp True
     total = float(data['form']['total'])   # total is null here
-
+    # print("[processTransaction] Order ID: ", order.id)
+    # print("Get cart total: ", order.get_cart_total)
     if total == order.get_cart_total:
+        order.student = student
         order.complete = True  # not set to true after payment w mywallet on checkout page
+        # print("trueeee")
     order.save()
 
     Transaction.objects.create(
@@ -409,7 +408,7 @@ def processTransaction(request):
 
 @login_required(login_url='/login/')
 def processTopup(request):
-    transaction_id = datetime.datetime.now().timestamp()
+    transaction_id = datetime.now().timestamp()
     data = json.loads(request.body)
 
     parent = request.user.parent
@@ -419,9 +418,8 @@ def processTopup(request):
     Transaction.objects.create(
         parent=parent,
         transaction_id=transaction_id,
-        date=datetime.datetime.now(),
+        date=datetime.now(),
         transaction_type='Deposit',
-        description='Online',
         amount=data['form']['amount'],
     )
     return JsonResponse('Payment Complete', safe=False)
@@ -429,7 +427,7 @@ def processTopup(request):
 
 @login_required(login_url='/login/')
 def processReload(request):
-    transaction_id = datetime.datetime.now().timestamp()
+    transaction_id = datetime.now().timestamp()
     data = json.loads(request.body)
 
     parent = request.user.parent
@@ -445,9 +443,8 @@ def processReload(request):
             parent=parent,
             student=student,
             transaction_id=transaction_id,
-            date=datetime.datetime.now(),
+            date=datetime.now(),
             transaction_type='Transfer',
-            description='Reload',
             amount=data['form']['amount'],
         )
         return JsonResponse('Payment Complete', safe=False)
@@ -456,9 +453,10 @@ def processReload(request):
         return JsonResponse('Not enough balance', safe=False)
 
 # refered https://medium.com/@saijalshakya/generating-pdf-with-reportlab-in-django-ee0235c2f133 & https://eric.sau.pe/reportlab-and-django-part-1-the-set-up-and-a-basic-example
+
+
 def download_receipt(request, pk):
-    transactions = Transaction.objects.get(id=pk)    
-    items = transactions.order.orderitem_set.all()
+    transactions = Transaction.objects.get(id=pk)
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="receipt.pdf"'
@@ -481,24 +479,40 @@ def download_receipt(request, pk):
         ["Invoice Date", ":", transactions.date.strftime("%d/%m/%Y")]
     ], [60, 10, 150])
 
-    DetailTable = Table([
-        ["Name", ":",  transactions.parent],
-        ["Description", ":", transactions.description]
-    ], [60, 10, 150])
+    if transactions.description is not None:
+        DetailTable = Table([
+            ["Name", ":",  transactions.parent],
+            ["Student Name", ":",  transactions.student],
+            ["Description", ":", transactions.description]
+        ], [70, 10, 150])
+    else:
+        DetailTable = Table([
+            ["Name", ":",  transactions.parent],
+            ["Description", ":", transactions.description]
+        ], [70, 10, 150])
 
     InvoiceDetailTable = Table([
         [InvoiceTable, DetailTable],
     ])
 
-    data=[["No.", "Product", "Quantity", "Unit Price (RM)", "Total (RM)"],]
-    count=0
-    for i in items:
-        count+=1        
-        data.append([
-            count, i.product, i.quantity,
+    if transactions.description is not None:
+        items = transactions.order.orderitem_set.all()
+        data = [["No.", "Product", "Quantity",
+                 "Unit Price (RM)", "Total (RM)"], ]
+        count = 0
+        for i in items:
+            count += 1
+            data.append([
+                count, i.product, i.quantity,
                 "{:.2f}".format(i.product.price), "{:.2f}".format(i.get_total),
-                ])    
-    ProdcuctTable = Table(data, [60, 400, 60, 80, 60])    
+            ])
+        ProdcuctTable = Table(data, [60, 400, 60, 80, 60])
+    else:
+        data = [["No.", "Transaction Type", "Amount (RM)"], ]
+        data.append([
+            "1", transactions.transaction_type, transactions.amount,
+        ])
+        ProdcuctTable = Table(data, [60, 400, 60, 80, 60])
 
     ElemTable = Table([
         [InvoiceDetailTable],
@@ -514,14 +528,17 @@ def download_receipt(request, pk):
         spaceBefore=6,
         rightIndent=20
     )
-
     NoteStyle = styles['BodyText']
     NoteStyle.textColor = gray
     NoteStyle.leftIndent = 10
     OrgStyle = styles['Heading5']
     OrgStyle.alignment = 1
 
-    Total = Paragraph(text =("Total: RM %.2f"% (transactions.order.get_cart_total)), style=TotalStyle)
+    if transactions.description is not None:
+        Total = Paragraph(text=("Total: RM %.2f" %
+                                (transactions.order.get_cart_total)), style=TotalStyle)
+    else:
+        Total = Paragraph(text=(""), style=TotalStyle)
 
     Note = Paragraph(''' 
         Note: This receipt is computer generated and no signature is required

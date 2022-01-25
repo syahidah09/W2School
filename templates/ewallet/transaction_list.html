@@ -1,0 +1,144 @@
+{% extends 'partials/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %} Transaction History {% endblock %}
+
+{% block content %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+  <div class="container-fluid px-0">
+    <div class="row gy-4">
+      <div class="d-flex mb-0 justify-content-between align-items-center">
+        <h2 class="my-0">Transaction History</h2>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+  <div class="container-fluid">
+    <!-- Filter -->
+    <form method="get">
+      <div class="card card-body mb-2">
+        <h4 class="mt-0"><strong>Filter</strong></h4>
+        <div class="row">
+          <div class="form-group col-sm-4 col-md-3 ">
+            {{ filter.form.date.label_tag }}
+            <div class="d-flex justify-content-between">
+              {% render_field filter.form.date class="form-control" placeholder="01/01/2021" %}
+            </div>
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            {{ filter.form.transaction_type.label_tag }}
+            {% render_field filter.form.transaction_type class="form-select" %}
+          </div>
+          <div class="form-group col-sm-4 col-md-3">
+            {{ filter.form.description.label_tag }}
+            {% render_field filter.form.description class="form-select" %}
+          </div>
+        </div>
+        <div class="d-flex flex-wrap">
+          <button type="submit" class="btn btn-primary mt-2">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <a class="btn btn-primary mt-2 mx-2" href="{% url 'ewallet:transactions' 1 %}">Clear</a>
+        </div>
+      </div>
+    </form>
+
+    <!-- Transactions -->
+    <div class="row gy-4">
+      <div class="col-lg-12">
+        <div class="card mb-0">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table mb-0 align-middle" style="text-align: center">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Date</th>
+                    <th>Payer</th>
+                    <th>Transaction Type</th>
+                    <th>Description</th>
+                    <th>Amount(RM)</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                {% for transaction in filter.qs %}
+                <tbody>
+                  <tr>
+                    <td><a class="btn btn-sm btn-secondary" href="{{ transaction.get_absolute_url2 }}">View</a></td>
+                    <td>{{ transaction.date|date:'d/m/Y' }}</td>
+                    {% if transaction.parent is not None %}
+                    <td>{{ transaction.parent }}</td>
+                    {% else %}
+                    <td>{{ transaction.student }}</td>
+                    {% endif %}
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>{{ transaction.amount|floatformat:2 }}</td>
+                    {% if transaction.transaction_id is not None %}
+                    <td>
+                      <a href="{% url 'ewallet:download_receipt' transaction.id %}" class="btn btn-sm btn-success">Download
+                        Receipt</a>
+                      {% else %}
+                    <td><button class="btn btn-sm btn-secondary">Receipt Unavailable</button></td>
+                    {% endif %}
+                  </tr>
+                </tbody>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><br>
+
+    <!-- Pagination -->
+    <!-- <ul class="pagination pagination-sm">
+      <li class="page-item {% if not transactions.has_previous %} disabled {% endif %}">
+        <a class="page-link"
+           href="{% if transactions.has_previous %} {% url 'ewallet:transactions' transactions.previous_page_number %}{% endif %} ">Previous</a>
+      </li>
+
+      {% if transactions.number|add:'-1' > 1 %}
+      <li class="page-item disabled"><a class="page-link">&hellip;</a></li>
+      {% endif %}
+
+      Page numbers
+      {% for i in transactions.paginator.page_range %}
+      {% if transactions.number == i %}
+      <li class="active page-item disabled"><a class="page-link" href="#">{{ i }}</a></li>
+      {% elif i > transactions.number|add:'-2' and i < transactions.number|add:'2' %}
+      <li class="page-item"><a class="page-link" href="{% url 'ewallet:transactions' i %}">{{ i }}</a></li>
+      {% endif %}
+      {% endfor %}
+
+      {% if transactions.paginator.num_pages > transactions.number|add:'1' %}
+      <li class="page-item disabled"><a class="page-link" href="#">&hellip;</a></li>
+      {% endif %}
+
+      <li class="page-item {% if not transactions.has_next %} disabled {% endif %}">
+        <a class="page-link"
+           href="{% if transactions.has_next %} {% url 'ewallet:transactions' transactions.next_page_number %} {% endif %}">Next</a>
+      </li>
+    </ul> -->
+
+
+  </div>
+</section>
+{% endblock %}
+
+{% block js_scripts %}
+<script>
+  $(function () {
+    $("#id_date_0").datepicker({
+      dateFormat: "dd/mm/yy"
+    });    
+    $("#id_date_1").datepicker({
+      dateFormat: "dd/mm/yy"
+    });
+  });
+</script>
+{% endblock %}

@@ -17,7 +17,7 @@ urlpatterns = [
      path('reload/', views.reload, name='reload'),
 
      path('transactions/<int:page>/', views.transaction_history, name='transactions'),
-     path('transaction/detail/<int:pk>', views.TransactionDetail, name='transaction-detail'),
+     path('transaction/detail/<int:pk>', views.transaction_detail, name='transaction-detail'),
      path('download_receipt/<int:pk>', views.download_receipt, name='download_receipt'),
 
      path('process_topup/', views.processTopup, name="process_topup"),

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Parent(models.Model):
     user = models.OneToOneField(
-        User, null=True, blank=True, on_delete=models.SET_NULL)    
+        User, null=True, blank=True, on_delete=models.CASCADE)    
     phone = models.CharField(max_length=200, null=True, blank=True)    
     wallet_balance = models.FloatField(default=0)
 
@@ -15,13 +15,16 @@ class Parent(models.Model):
     def get_absolute_url2(self):
         return reverse('ewallet:parent-detail', args=[str(self.id)])
 
+    def get_absolute_url3(self):
+        return reverse('ewalletAdmin:student-create', args=[str(self.id)])
+
     def get_update(self):
         return reverse('ewalletAdmin:parent-update', args=[str(self.id)])
 
     def get_update2(self):
         return reverse('ewallet:parent-update', args=[str(self.id)])
 
-    def confirm_delete(self):
+    def confirm_delete(self):        
         return reverse('ewalletAdmin:parent-delete', args=[str(self.id)])
 
     def __str__(self):
@@ -46,20 +49,35 @@ class Student(models.Model):
     first_name = models.CharField(max_length=200, null=True)
     last_name = models.CharField(max_length=200, null=True)
     class_name   = models.CharField(
-                 max_length=10, choices=CLASS_NAME, default='1A')
+                 max_length=10, choices=CLASS_NAME, blank=True)
     parent       = models.ForeignKey(
                 Parent, null=True, blank=True, on_delete=models.SET_NULL)
     card_id     = models.CharField(max_length=10, unique=True, null=True, blank=True,)
     wallet_balance = models.FloatField(default=0)
 
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
+        full_name = u'%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    @property
+    def get_total_spent(self):
+        transaction = self.transaction_set.all()
+        total = sum([item.amount for item in transaction])
+        return "{:.2f}".format(total)
+
     def get_absolute_url(self):
         return reverse('ewalletAdmin:student-detail', args=[str(self.student_id)])
+    
+
 
     def get_update(self):
         return reverse('ewalletAdmin:student-update', args=[str(self.student_id)])
 
     def confirm_delete(self):
-        return reverse('ewalletAdmin:student-delete', args=[str(self.student_id)])
+        return reverse('ewalletAdmin:student-delete', args=[str(self.student_id)])    
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -69,9 +87,15 @@ class Student(models.Model):
 
 
 class Product(models.Model):
+    CATEGORIES = [
+    ("School Items", "School Items"),
+    ("Stationery", "Stationery"),
+    ("Workbook", "Workbook"),
+    ("Food & Drinks", "Food & Drinks"), 
+    ]
     name = models.CharField(max_length=200, null=True)
     price = models.FloatField()
-    category = models.CharField(max_length=200, null=True)
+    category = models.CharField(max_length=200, blank=True, choices=CATEGORIES)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     image = models.ImageField(null=True, blank=True)
 
@@ -104,10 +128,9 @@ class Order(models.Model):
             Parent, null=True, blank=True, on_delete=models.SET_NULL)
     student = models.ForeignKey(
             Student, null=True, blank=True, on_delete=models.SET_NULL)  # as receiver for parent's on9 purchase
-    date_ordered = models.DateTimeField(auto_now_add=True)
-    complete = models.BooleanField(
-            default=False, null=True, blank=False)  # complete
-    received = models.BooleanField(default=False, null=True, blank=False)
+    date_ordered = models.DateTimeField(auto_now_add=False)
+    complete = models.BooleanField(default=False)
+    receive = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
@@ -134,7 +157,7 @@ class OrderItem(models.Model):
     order   = models.ForeignKey(
             Order, null=True, blank=True, on_delete=models.SET_NULL)
     quantity = models.IntegerField(default=0, null=True, blank=True)
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_added = models.DateTimeField(auto_now_add=False)
 
     def __str__(self):
         return str(self.product.name)
@@ -149,30 +172,28 @@ class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('Deposit', 'Deposit'),
         ('Transfer', 'Transfer'),
-        ('Payment', 'Payment'),
-        ('Scan & Pay', 'Scan & Pay'),
+        ('Payment', 'Payment'),        
     ]
 
-    DESCRIPTION = [
-        ('Online', 'Online'),
-        ('Reload', 'Reload'),
+    DESCRIPTION = [        
         ('Canteen', 'Canteen'),
         ('Co-op', 'Co-op'),
         ('e-Store', 'e-Store'),
         ('School Fee', 'School Fee'),
     ]
+    
     transaction_id  = models.CharField(max_length=100, null=True)
     parent          = models.ForeignKey(
                     Parent, null=True, blank=True, on_delete=models.SET_NULL)
     student         = models.ForeignKey(
                     Student, null=True, blank=True, on_delete=models.SET_NULL)  # as receiver for parent's on9 purchase   
-    date            = models.DateTimeField(auto_now_add=True)
+    date            = models.DateTimeField(auto_now_add=False)
     amount          = models.FloatField(default=0)
     transaction_type = models.CharField(
                     max_length=15, choices=TRANSACTION_TYPES, default='Payment')
     description     = models.CharField(
-                    max_length=15, choices=DESCRIPTION, default='Online')
-    order           = models.OneToOneField(
+                    max_length=15, blank=True, choices=DESCRIPTION, default="-")
+    order           = models.ForeignKey(
                     Order, null=True, blank=True, on_delete=models.CASCADE)
 
     def get_absolute_url(self):
@@ -193,4 +214,12 @@ class Transaction(models.Model):
     class Meta:
         ordering = ['-date']  # - means desceding
 
+class Notifcation(models.Model):
+    parent      = models.ForeignKey(
+                Parent, null=True, blank=True, on_delete=models.SET_NULL)
+    subject     = models.CharField(max_length=200, null=True)
+    content     = models.CharField(max_length=200, null=True)
 
+    def __str__(self):
+        return self.subject
+        

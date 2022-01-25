@@ -1,0 +1,116 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %} Product List {% endblock %}
+
+{% block content %}
+<!-- Page Header-->
+<header class="bg-white shadow-sm px-4 py-3 z-index-20">
+    <div class="container-fluid px-0">
+        <div class="row gy-4">
+            <div class="d-flex mb-0 justify-content-between align-items-center">
+                <h2 class="my-0">Product List</h2>
+                <a class="btn w3-theme-d4 rounded-pill " type="button" href="{% url 'ewalletAdmin:product-create' %}">Add
+                    Product</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="pb-0 pt-3">
+    <div class="container-fluid">
+        <!-- Filter -->
+        <form method="get">
+            <div class="card card-body mb-2">
+                <h4 class="mt-0"><strong>Filter</strong></h4>
+                <div class="row">
+                    <!-- {{ filter.form }} -->
+                    <div class="form-group col-sm-4 col-md-3">
+                        {{ filter.form.name.label_tag }}
+                        {% render_field filter.form.name class="form-control" %}
+                    </div>
+
+                    <div class="form-group col-sm-4 col-md-3">
+                        {{ filter.form.category.label_tag }}
+                        {% render_field filter.form.category class="form-select" %}
+                    </div>                   
+
+                    <div class="form-group col-sm-4 col-md-3">
+                        {{ filter.form.price__gt.label_tag }}
+                        {% render_field filter.form.price__gt class="form-control" %}
+                    </div>
+
+                    <div class="form-group col-sm-4 col-md-3">
+                        <label for="id_price__lt">Price is less than:</label>
+                        <input type="number" name="price__lt" step="any" class="form-control" id="id_price__lt">
+                    </div>
+
+                    <div class="form-group col-sm-4 col-md-3">
+                        <label for="id_quantity__gt">Quantity is greater than:</label>
+                        <input type="number" name="quantity__gt" step="any" class="form-control" id="id_quantity__gt">
+                    </div>
+
+                    <div class="form-group col-sm-4 col-md-3">
+                        <label for="id_quantity__lt">Quantity is less than:</label>
+                        <input type="number" name="quantity__lt" step="any" class="form-control" id="id_quantity__lt">
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap">
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a class="btn btn-primary mt-2 mx-2" href="{% url 'ewalletAdmin:products' %}">Clear</a>
+                </div>
+            </div>
+        </form>
+
+
+        <!-- Product Table -->
+        <div class="row gy-4">
+            <div class="col-lg-12">
+                <div class="card mb-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0 align-middle" style="text-align: center">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>Price(RM)</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                {% if product %}
+                                {% for product in filter.qs %}
+                                <tbody>
+                                    <tr>
+                                        <td><a class="btn btn-sm btn-secondary"
+                                               href="{{ product.get_absolute_url }}">View</a></td>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.price|floatformat:2 }}</td>
+                                        <td>{{ product.quantity }}</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-info" href="{{ product.get_update }}">Update</a>
+                                            <a class="btn btn-sm btn-danger"
+                                               href="{{ product.confirm_delete }}">Delete</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                                {% else %}
+                                <p>There are no product in the record.</p>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+    </div>
+</section>
+<script>
+    document.getElementById('id_category').classList.add("form-select");
+</script>
+{% endblock %}

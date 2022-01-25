@@ -10,7 +10,7 @@ class StudentForm(ModelForm):
     class Meta:
         model = Student
         fields = '__all__'
-        exclude = ('parent', 'card_id', 'batch')
+        exclude = ('parent', 'card_id', 'batch', 'wallet_balance')
         widgets = {            
             'name': TextInput(attrs={'size': 60}),
         }
@@ -47,7 +47,7 @@ class StudentForm(ModelForm):
 class CreateUserForm(UserCreationForm):
 	class Meta:
 		model = User
-		fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+		fields = ['first_name', 'last_name', 'password1', 'password2']
 
 class TransferForm(ModelForm):
     class Meta:
@@ -99,7 +99,7 @@ class TransactionForm(ModelForm):
 class UserForm(ModelForm):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+        fields = ('username', 'first_name', 'last_name', 'email',)
 class ParentForm(ModelForm):
     class Meta:
         model = Parent

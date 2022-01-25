@@ -20,3 +20,27 @@
 .w3-hover-theme:hover {color:#fff !important; background-color:#009688 !important}
 .w3-hover-text-theme:hover {color:#009688 !important}
 .w3-hover-border-theme:hover {border-color:#009688 !important}
+
+.btn-gradient {
+	box-shadow:inset 0px 1px 0px 0px #a4e271;
+	background:linear-gradient(to bottom, #89c403 5%, #77a809 100%);
+	background-color:#89c403;
+	border-radius:3px;
+	border:1px solid #74b807;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:13px;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #528009;
+}
+.btn-gradient :hover {
+	background:linear-gradient(to bottom, #77a809 5%, #89c403 100%);
+	background-color:#77a809;
+}
+.btn-gradient :active {
+	position:relative;
+	top:1px;
+}

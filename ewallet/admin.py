@@ -28,3 +28,4 @@ class StudentAdmin(admin.ModelAdmin):
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('transaction_id', 'transaction_type', 'parent', 'amount')
+    search_fields = ('parent', )
