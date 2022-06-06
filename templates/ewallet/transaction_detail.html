@@ -9,7 +9,7 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 justify-content-between align-items-center">
-                <a class="me-3" href="{% url 'ewallet:transactions' 1 %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <a class="me-3 btn w3-theme-d4 rounded-pill" href="{% url 'ewallet:transactions' 1 %}"> <i class="fas fa-arrow-left"></i></a>
                 <h2 class="me-auto my-0">Transaction Detail</h2>
                 <!-- {% if transaction.transaction_type == 'Payment' and transaction.order is not None %} -->
                 <a href="{% url 'ewallet:download_receipt' transaction.id %}" class="btn btn-sm btn-success">Download
@@ -50,7 +50,7 @@
         <div class="row gy-4">
             <div class="col-lg-12">
                 <div class="table-responsive">
-                    <table class="table table-responsive table-bordered mb-0 align-middle" style="text-align: center">
+                    <table class="table table-responsive table-bordered mb-0 align-middle bg-light" style="text-align: center">
                         <thead>
                             <tr>
                                 <th>Product</th>

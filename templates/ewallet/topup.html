@@ -10,23 +10,13 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 align-items-center">
-                <a class="me-3" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <a class="me-3 btn w3-theme-d4 rounded-pill" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left"></i></a>
                 <h2 class="me-auto my-0">Top Up</h2>
             </div>
         </div>
     </div>
 </header>
 
-<!--
-<div class="col-lg-6">    
-    <div class="form-group">
-    <label for="inputAmount">Top Up Amount</label>
-    <input type="text" id="inputAmount" class="form-control" aria-describedby="amountHelpBlock">
-    <small id="amountHelpBlock" class="text-muted">
-        Minimum amount RM 10
-    </small>
-    </div>    
-</div>-->
 
 <section class="pb-0 pt-3 mb-3">
     <div class="container-fluid">
@@ -36,7 +26,7 @@
                 <strong>Invalid amount.</strong> Please enter atleast RM10 or more.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <p class="mb-0">How much do you want to transfer?</p>
+            <p class="mb-0">How much do you want to top up?</p>
             <form id="form" class="form-horizontal" method="POST" action="">
                 {% csrf_token %}
                 <div class="col-sm-4" id="topup-info">
@@ -52,8 +42,8 @@
         </div><br>
         <div class="row gy-4 ">
             <div class="col-6 " id="payment-info">
-                <div id="paypal-button-container" class="card visually-hidden p-2">
-                    <h4>Payment Methods</h4>
+                <div id="paypal-button-container" class="card visually-hidden rounded-3 shadow p-2 px-4">
+                    <h4 class="mt-0">Payment Methods</h4>
                 </div>
                 <script>paypal.Buttons().render('body');</script>
             </div>
@@ -80,7 +70,9 @@
         if (form.amount.value == 0) {
             console.log('Invalid amount')
             document.getElementById('alert').classList.remove("visually-hidden");
-            // alert('Invalid amount');
+            $("#alert").fadeTo(2000, 1000).slideUp(1000, function () {
+                $("#alert").slideUp(1000);
+            });           
         } else {
             document.getElementById('paypal-button-container').classList.remove("visually-hidden");
             document.getElementById('paypal-button-container').classList.add("scale-up-top");

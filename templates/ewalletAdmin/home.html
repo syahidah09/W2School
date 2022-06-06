@@ -1,7 +1,11 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
-{% block title %} Dashboard {% endblock %}
+{% block custom_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+{% endblock %}
+{% block title %} Home {% endblock %}
 
 {% block content %}
 
@@ -16,37 +20,60 @@
 <section class="pb-0 pt-3">
     <div class="container-fluid">
         <div class="row gy-3">
-            <div class="col-lg">
+            <div class="col-sm-4">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Total Students</h3>
+                        <h5 class="text-center my-0"><strong>Total Students</strong></h5>
                     </div>
                     <div class="card-body">
                         <h1 style="text-align: center;padding: 5px">{{ student.count }}</h1>
                     </div>
                 </div>
             </div>
-            <div class="col-lg">
+            <div class="col-sm-4">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Total Registered Parents</h3>
+                        <h5 class="text-center my-0"><strong>Total Registered Parents</strong></h5>
                     </div>
                     <div class="card-body">
                         <h1 style="text-align: center;padding: 5px">{{ parent.count }}</h1>
                     </div>
                 </div>
             </div>
-            <div class="col-lg">
+            <div class="col-sm-4">
                 <div class="card bg-light mb-1 border-dark">
                     <div class="card-header">
-                        <h3 class="h4 mb-0" style="text-align: center">Total Sales</h3>
+                        <h5 class="text-center my-0"><strong>Total Sales</strong></h5>                        
                     </div>
                     <div class="card-body">
                         <h1 style="text-align: center;padding: 5px">RM {{ total }}</h1>
                     </div>
                 </div>
             </div>
-            
+            <!-- Bar Chart  -->
+            <div class="col-sm-4 col-lg-4 offset-lg-4">
+                <div class="card mb-0 h-100 bg-light">
+                    <div class="card-header">
+                        <h5 class="text-center my-0"><strong>Total Money Spent of Students</strong></h5>                                                    
+                    </div>
+                    <div class="card-body">
+                        <canvas id="myChart" width="100" height="50"></canvas>
+                    </div>
+                </div>
+            </div>
+             <!-- Bar Chart  -->
+             <!-- <div class="col-lg-6">
+                <div class="card mb-0 h-100 bg-light">
+                    <div class="card-header">
+                        <h5 class="text-center my-0"><strong>Sales of year {{ year }} </strong></h5>   
+                                                
+                    </div>
+                    <div class="card-body">
+                        <canvas id="myChart2" width="100" height="50"></canvas>
+                    </div>
+                </div>
+            </div> -->
+
         </div>
     </div>
 </section>
@@ -54,7 +81,7 @@
 <!-- Charts Section-->
 <section class="charts">
     <div class="container-fluid">
-        <div class="row gy-4 align-items-stretch">            
+        <div class="row gy-4 align-items-stretch">
             <!-- Chart -->
             <!-- <div class="col-lg-4">
                 <div class="card mb-0 h-100">
@@ -66,13 +93,13 @@
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="closeCard1">
-                                    <h4>Select Period</h4>
+                                    <h5>Select Period</h5>
                                     <a class="dropdown-item py-1 px-3 remove" href="#"> <i class="fas fa-times"></i>Close</a>
                                     <a class="dropdown-item py-1 px-3 edit" href="#"> <i class="fas fa-cog"></i>Edit</a>
                                 </div>
                             </div>
                         </div>
-                        <h3 class="h4 mb-0">Student's</h3>
+                        <h5 class="h5 mb-0">Student's</h5>
                     </div>
                     <div class="card-body">
                         <div class="btn-group btn-group-sm d-flex flex-center" role="group"
@@ -101,38 +128,91 @@
 {% endblock %}
 
 {% block js_scripts %}
-<script src="{% static 'js/charts-custom.js' %}"></script>
-<script>
-    const ctx = document.getElementById('myChart').getContext('2d');    
-    const myChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: [{% for student in student %} '{{ student.first_name }}', {% endfor %}],
-            datasets: [{
-                label: 'Amount Spend',
-                data: [{% for student in student %} '{{ student.get_total_spent }}', {% endfor %}],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-                }]
-            }, 
-    });
+<script>        
+    var color = [];
+    var color2 = [];
+    for (var i = 0; i < 10; ++i) {  
+        randomBetween = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+        r = randomBetween(50, 255);
+        g = randomBetween(50, 255);
+        b = randomBetween(50, 255);
+        rgb = `rgb(${r},${g},${b},0.5)`; 
+        rgb2 = `rgb(${r},${g},${b})`;      
+        color.push(rgb);
+        color2.push(rgb2);
+        // console.log(rgb)
+    };
+    // setup 
+    const data = {
+        labels: [{% for i in test.keys %} '{{ i }}', {% endfor %}],
+        datasets: [{
+            label: 'Money Spent',
+            data: [{% for i in test.values %} '{{ i|floatformat:2 }}', {% endfor %}],
+            backgroundColor: color,
+            borderColor: color2,
+            borderWidth: 2
+        }]
+    };
 
+    // config 
+    const config = {
+        type: 'doughnut',
+        data,
+        options: {
+            plugins: {
+                // Change options for ALL labels of THIS CHART
+                datalabels: {
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                }
+            }
+        },
+        plugins: [ChartDataLabels],
+    };
 
+    // render init block
+    const myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+    );
+
+    // 2nd chart
+    // setup 
+    const data2 = {
+        labels: [{% for i in test2.keys %} '{{ i }}', {% endfor %}],
+    datasets: [{
+        label: 'Sales of year {{ year }}',
+        data: [{% for i in test2.values %} '{{ i|floatformat:2 }}', {% endfor %}],
+        backgroundColor: color,
+        borderColor: color2,
+        borderWidth: 2
+      }]
+    };
+    
+    // config 
+    const config2 = {
+        type: 'bar',
+        data2,
+        options: {
+            plugins: {
+                // Change options for ALL labels of THIS CHART
+                datalabels: {
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                }
+            }
+        },
+        plugins: [ChartDataLabels],
+    };
+    
+    // render init block
+    const myChart2 = new Chart(
+        document.getElementById('myChart2'),
+        config2
+    );
 </script>
-
 {% endblock %}

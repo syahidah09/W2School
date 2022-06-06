@@ -71,7 +71,7 @@
           </li>
           {% else %}
           <!-- Notifications-->
-          {% if notification is not None %}
+          {% if notification %}
           <!-- <li class="nav-item dropdown">
             <a class="nav-link text-white" id="notifications" href="#"
                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -98,30 +98,34 @@
           </li> -->
           {% endif %}
           <!-- Cart -->
+          {% if items %}
           <li class="nav-item dropdown">
             <a class="nav-link text-white" id="cart" href="#" data-bs-toggle="dropdown"
                aria-expanded="false">
               <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-              <!-- <span class="badge bg-red badge-corner fw-normal">1</span> -->
+              <span class="badge bg-red badge-corner fw-normal">{{ items.count }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end mt-3 shadow-sm" aria-labelledby="cart">
               <li>
-                <a class="dropdown-item py-3" href="#">
-                  <div class="d-flex">
+                <a class="dropdown-item pt-3" href="#">
+                  {% for item in items %}
+                  <div class="d-flex flex-row align-items-center">                    
                     <div class="icon icon-sm bg-blue">
                       <i class="fas fa-question-circle" aria-hidden="true"></i>
                     </div>
                     <div class="ms-3">
-                      <!-- <span class="h6 d-block fw-normal mb-1 text-xs text-gray-600">Science Form 5</span> -->
-                      <!-- <small class="small text-gray-600">RM 20 </small> -->
-                    </div>
-                  </div>
+                      <span class="h6 d-block fw-normal mb-1 text-xs text-gray-600">{{ item.product.name }}</span>
+                      <small class="small text-gray-600">RM {{ item.product.price|floatformat:2 }} </small>
+                    </div>                   
+                  </div><hr class="my-2">  
+                  {% endfor %}
                 </a>
               </li>
-              <li><a class="dropdown-item all-notifications text-center" href="{% url 'ewallet:cart' %}"> <strong
+              <li><a class="dropdown-item all-notifications text-center mt-0" href="{% url 'ewallet:cart' %}"> <strong
                           class="text-xs text-gray-600">View cart </strong></a></li>
             </ul>
           </li>
+          {% endif %}
           <!-- Logout    -->
           <li class="nav-item">
             <a class="nav-link text-white" href="{% url 'ewallet:logout' %}">

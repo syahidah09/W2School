@@ -53,7 +53,10 @@
                             <div class="d-flex align-items-center px-4 px-lg-5 h-100">
                                 <form class="login-form py-5 w-100" method="POST" action="">
                                     {% for message in messages %}
-                                    <p>{{message}}</p>
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">                                        
+                                        <i class="fas fa-exclamation-triangle me-xl-3"></i>{{ message | safe }} 
+                                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
                                     {% endfor %}
 
                                     {% csrf_token %}

@@ -58,7 +58,7 @@
         <div class="row gy-4">
             <!-- Bar Chart  -->
             <div class="col-lg-4">
-                <div class="card mb-0 h-100">
+                <div class="card mb-0 h-100 bg-light">
                     <div class="card-header d-flex align-items-center">
                         <h3 class="h4 mb-0">Your Children's Spending This Month</h3>
                     </div>
@@ -78,27 +78,31 @@
                             <table class="table mb-0 table-hover table-sm" style="text-align: center">
                                 <thead>
                                     <tr>
+                                        <th>Date</th>
                                         <th>Transaction Type</th>
                                         <th>Description</th>
-                                        <th>Amount</th>
-                                        <th>Date</th>
+                                        <th>Amount</th>                                        
                                     </tr>
                                 </thead>
-                                {% for transaction in transaction %}
+                                {% if transactions %}
+                                {% for i in transactions %}
                                 <tbody>
                                     <tr>
-                                        <td>{{ transaction.transaction_type }}</td>
-                                        <td>{{ transaction.description }}</td>
-                                        <td>{{ transaction.amount|floatformat:2 }}</td>
-                                        <td>{{ transaction.date|date:'d/m/Y' }}</td>
+                                        <td>{{ i.date|date:'d/m/Y' }}</td>
+                                        <td>{{ i.transaction_type }}</td>
+                                        <td>{{ i.description }}</td>
+                                        <td>{{ i.amount|floatformat:2 }}</td>                                        
                                     </tr>
                                 </tbody>
                                 {% endfor %}
+                                {% else %}
+                                <td>There are no record.</td>
+                                {% endif %}
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>            
         </div>
     </div>
 </section>
@@ -153,57 +157,56 @@
 {% endblock %}
 
 {% block js_scripts %}
-<script>   
-    
-// setup 
-const data = {
-      labels: [{% for ltr in ltr %} '{{ ltr.0 }}', {% endfor %}],
-      datasets: [{
+<script>
+    // setup 
+    const data = {
+        labels: [{% for ltr in ltr %} '{{ ltr.0 }}', {% endfor %}],
+    datasets: [{
         label: 'Weekly Sales',
         data: [{% for ltr in ltr %} '{{ ltr.1 }}', {% endfor %}],
         backgroundColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)'
         ],
-        borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-        ], 
-        borderWidth: 1
+            borderColor: [
+                'rgba(255, 99, 132)',
+                'rgba(54, 162, 235)',
+                'rgba(255, 206, 86)',
+                'rgba(75, 192, 192)',
+                'rgba(153, 102, 255)',
+                'rgba(255, 159, 64)'
+            ],
+                borderWidth: 2
       }]
     };
 
     // config 
     const config = {
-      type: 'pie',
-      data,
-      options: {
-        plugins: {
-      // Change options for ALL labels of THIS CHART
-      datalabels: {        
-        font: {
-          weight: 'bold',
-          size:14
-        },        
-      }
-    }
-      },
-      plugins:[ChartDataLabels],
+        type: 'pie',
+        data,
+        options: {
+            plugins: {
+                // Change options for ALL labels of THIS CHART
+                datalabels: {
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                }
+            }
+        },
+        plugins: [ChartDataLabels],
     };
 
     // render init block
     const myChart = new Chart(
-      document.getElementById('myChart'),
-      config
-    );    
+        document.getElementById('myChart'),
+        config
+    );
 
 </script>
 {% endblock %}

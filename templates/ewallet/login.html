@@ -20,7 +20,7 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
             integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
             crossorigin="anonymous"></script>
-    
+
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="{% static 'css/style.default.css' %}" id="theme-stylesheet">
     <link rel="stylesheet" href="{% static 'css/w3-theme-teal.css' %}">
@@ -54,7 +54,14 @@
 
                                 <form class="login-form py-5 w-100" method="POST" action="">
                                     {% for message in messages %}
-                                    <p>{{message}}</p>
+                                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" id="msg">
+                                        {% if message.tags == 'alert-danger' %}
+                                        <i class="fas fa-exclamation-triangle me-xl-3"></i>
+                                        {% endif %}
+                                        {{ message | safe }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                    </div>
                                     {% endfor %}
 
                                     {% csrf_token %}
@@ -65,7 +72,8 @@
                                     </div>
                                     <div class="row gy-2 mb-4">
                                         <div class="col-sm">
-                                            <input type="text" name="username" placeholder="Username..." class="form-control" required="Please fill your username">
+                                            <input type="text" name="username" placeholder="Username..." class="form-control"
+                                                   required="Please fill your username">
                                         </div>
                                     </div>
                                     <div class="row gy-2 mb-0 form-label">
@@ -75,19 +83,18 @@
                                     </div>
                                     <div class="row gy-2 mb-2">
                                         <div class="col-sm">
-                                            <input type="password" name="password" placeholder="Password..." required="Please fill your password"
+                                            <input type="password" name="password" placeholder="Password..."
+                                                   required="Please fill your password"
                                                    class="form-control">
                                         </div>
                                     </div>
                                     <div class="d-flex flex-column gy-2">
                                         <a class="text-sm text-paleBlue" href="#">Forgot Password?</a><br>
-                                        <button class="btn w3-theme-d1 mb-3" type="submit">Login</button>
+                                        <button class="btn w3-theme-d1 mb-3" id="login" type="submit">Login</button>
                                         <small class="text-gray-700">Do not have an account? </small>
                                         <a class="btn w3-theme-d1 mb-4" href="{% url 'ewallet:register' %}">Register</a>
                                         <a class="btn w3-theme-d5 text-md " href="{% url 'ewallet:front_page' %}">Back</a>
                                     </div>
-
-
                                 </form>
                             </div>
                         </div>
@@ -122,6 +129,18 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
           integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
+    <script>
+        $("#msg").fadeTo(2000, 700).slideUp(700, function () {
+            $("#msg").slideUp(700);
+        });
+        $(document).ready(function () {            
+            $("#login").click(function showAlert() {
+                $("#msg").fadeTo(2000, 700).slideUp(700, function () {
+                    $("#msg").slideUp(700);
+                });
+            });
+        });
+    </script>
 
 </body>
 

@@ -7,17 +7,16 @@ TRANSACTION_TYPES = [
     ('Deposit', 'Deposit'),
     ('Transfer', 'Transfer'),
     ('Payment', 'Payment'),
-    ('Scan & Pay', 'Scan & Pay'),
 ]
 
 DESCRIPTION = [
-    ('Online', 'Online'),
-    ('Reload', 'Reload'),
     ('Canteen', 'Canteen'),
     ('Co-op', 'Co-op'),
     ('e-Store', 'e-Store'),
     ('School Fee', 'School Fee'),
 ]
+
+
 class TransactionFilter(FilterSet):
     date = DateFromToRangeFilter(label='Date Range')
     transaction_type = ChoiceFilter(choices=TRANSACTION_TYPES)
@@ -27,10 +26,12 @@ class TransactionFilter(FilterSet):
         model = Transaction
         fields = ('date', 'transaction_type', 'description')
 
-class StudenttFilter(FilterSet):   
+
+class StudenttFilter(FilterSet):
     class Meta:
         model = Student
         fields = ('student_id',)
+
 
 CATEGORIES = [
     ("School Items", "School Items"),
@@ -41,8 +42,8 @@ CATEGORIES = [
 
 
 class ProductFilter(FilterSet):
-    name = CharFilter(lookup_expr='icontains',label='Name')
-    category = ChoiceFilter(choices=CATEGORIES)    
+    name = CharFilter(lookup_expr='icontains', label='Name')
+    category = ChoiceFilter(choices=CATEGORIES)
 
     class Meta:
         model = Product

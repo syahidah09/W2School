@@ -64,7 +64,7 @@ class Student(models.Model):
 
     @property
     def get_total_spent(self):
-        transaction = self.transaction_set.all()
+        transaction = self.transaction_set.filter(transaction_type="Payment")
         total = sum([item.amount for item in transaction])
         return "{:.2f}".format(total)
 
@@ -116,7 +116,12 @@ class Product(models.Model):
         try:
             url = self.image.url
         except:
-            url = '/static/img/placeholder.png'
+            if self.category == "Food & Drinks":
+                url = '/static/img/cookie.jpg'
+            elif self.category == "Workbook":
+                url = '/static/img/book.png'
+            else:
+                url = '/static/img/stationery.jpg'
         return url
 
     class Meta:

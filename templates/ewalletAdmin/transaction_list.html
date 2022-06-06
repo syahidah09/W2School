@@ -26,19 +26,32 @@
                 <h4 class="mt-0"><strong>Filter</strong></h4>
                 <div class="row">
                     <!-- <div class="form-group col-sm-4 col-md-3">{{ filter.form }}</div>                     -->
-                    {% for form in filter.form %}
-                    <div class="form-group col-sm-4 col-md-3">
-                        {{ form.label_tag }}
-                        {% render_field form class="form-control" %}
+                    <div class="form-group col-sm-4 col-md-3 ">
+                        {{ filter.form.date.label_tag }}
+                        <div class="d-flex justify-content-between">
+                            {% render_field filter.form.date class="form-control" placeholder="01/01/2021" %}
+                        </div>
                     </div>
-                    {% endfor %}                    
+                    <div class="form-group col-sm-4 col-md-3 ">
+                        {{ filter.form.transaction_type.label_tag }}
+                        <div class="d-flex justify-content-between">
+                            {% render_field filter.form.transaction_type class="form-control" placeholder="01/01/2021" %}
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-4 col-md-3 ">
+                        {{ filter.form.description.label_tag }}
+                        <div class="d-flex justify-content-between">
+                            {% render_field filter.form.description class="form-control" placeholder="01/01/2021" %}
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-3">
+                        <button type="submit" class="btn btn-primary mt-4">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <a class="btn btn-primary mt-4 mx-2" href="{% url 'ewalletAdmin:transactions' %}">Clear</a>
+                    </div>
                 </div>
-                <div class="d-flex flex-wrap">
-                    <button type="submit" class="btn btn-primary mt-2">
-                        <i class="fas fa-search"></i> Search
-                    </button>
-                    <a class="btn btn-primary mt-2 mx-2" href="{% url 'ewalletAdmin:transactions' %}">Clear</a>
-                </div>
+
             </div>
         </form>
         <!-- Transaction Table -->
@@ -60,13 +73,17 @@
                                     </tr>
                                 </thead>
                                 {% if transaction %}
-                                {% for transaction in filter.qs %}
+                                {% for transaction in transaction %}
                                 <tbody>
                                     <tr>
                                         <!-- <td><a class="btn btn-sm btn-secondary" href="{{ transaction.get_absolute_url }}">View</a>
                                         </td> -->
                                         <td>{{ transaction.date|date:'d/m/Y' }}</td>
+                                        {% if transaction.parent is None %}
+                                        <th>{{ transaction.student }}</th>
+                                        {% else %}
                                         <th>{{ transaction.parent }}</th>
+                                        {% endif %}
                                         <td>{{ transaction.transaction_type }}</td>
                                         <td>{{ transaction.description }}</td>
                                         <td>{{ transaction.amount|floatformat:2 }}</td>
@@ -88,43 +105,32 @@
             </div>
         </div><br>
 
-        <!-- {% block pagination %}
-        {% if is_paginated %}
-        <div class="pagination">
-            <ul class="pagination pagination-sm">
+        {% block pagination %}
+        {% if transaction.has_other_pages %}
+        <ul class="pagination">
+            {% if transaction.has_previous %}
+            <li class="btn bg-light"><a href="?page={{ transaction.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+            <li class="btn bg-light disabled"><span>&laquo;</span></li>
+            {% endif %}
 
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Previous</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="">Previous</a>
-                </li>
-                {% endif %}
+            {% for i in transaction.paginator.page_range %}
+            {% if transaction.number == i %}
+            <li class="btn bg-light active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+            <li class="btn bg-light"><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
 
-                <li class="page-item page-current">
-                    <a class="page-link" href="#"><span>{{ page_obj.number }}</span></a>
-                </li> -->
-
-        <!-- <span class="page-current">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                </span> -->
-
-        <!-- {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="">Next</a>
-                </li>
-                {% endif %}
-
-            </ul>
-        </div>
+            {% if transaction.has_next %}
+            <li class="btn bg-light"><a href="?page={{ transaction.next_page_number }}">&raquo;</a></li>
+            {% else %}
+            <li class="btn bg-light disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
         {% endif %}
-        {% endblock %} -->
+
+        {% endblock %}
     </div>
 </section>
 

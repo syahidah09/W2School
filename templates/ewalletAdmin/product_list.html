@@ -23,45 +23,36 @@
         <!-- Filter -->
         <form method="get">
             <div class="card card-body mb-2">
-                <h4 class="mt-0"><strong>Filter</strong></h4>
+                
                 <div class="row">
+                    <h4 class="col-1 mt-0 text-center mt-5"><strong>Filter</strong></h4>
                     <!-- {{ filter.form }} -->
                     <div class="form-group col-sm-4 col-md-3">
                         {{ filter.form.name.label_tag }}
                         {% render_field filter.form.name class="form-control" %}
-                    </div>
-
-                    <div class="form-group col-sm-4 col-md-3">
                         {{ filter.form.category.label_tag }}
                         {% render_field filter.form.category class="form-select" %}
-                    </div>                   
-
+                    </div>
                     <div class="form-group col-sm-4 col-md-3">
                         {{ filter.form.price__gt.label_tag }}
                         {% render_field filter.form.price__gt class="form-control" %}
+                        {{ filter.form.price__lt.label_tag }}
+                        {% render_field filter.form.price__lt class="form-control" %}
                     </div>
-
                     <div class="form-group col-sm-4 col-md-3">
-                        <label for="id_price__lt">Price is less than:</label>
-                        <input type="number" name="price__lt" step="any" class="form-control" id="id_price__lt">
-                    </div>
-
-                    <div class="form-group col-sm-4 col-md-3">
-                        <label for="id_quantity__gt">Quantity is greater than:</label>
-                        <input type="number" name="quantity__gt" step="any" class="form-control" id="id_quantity__gt">
-                    </div>
-
-                    <div class="form-group col-sm-4 col-md-3">
-                        <label for="id_quantity__lt">Quantity is less than:</label>
-                        <input type="number" name="quantity__lt" step="any" class="form-control" id="id_quantity__lt">
+                        {{ filter.form.quantity__gt.label_tag }}
+                        {% render_field filter.form.quantity__gt class="form-control" %}
+                        {{ filter.form.quantity__lt.label_tag }}
+                        {% render_field filter.form.quantity__lt class="form-control" %}
+                    </div>                   
+                    <div class="col-sm-4 col-md-2">
+                        <button type="submit" class="btn btn-primary mt-4">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <a class="btn btn-primary mt-4 mx-2" href="{% url 'ewalletAdmin:products' %}">Clear</a>
                     </div>
                 </div>
-                <div class="d-flex flex-wrap">
-                    <button type="submit" class="btn btn-primary mt-2">
-                        <i class="fas fa-search"></i> Search
-                    </button>
-                    <a class="btn btn-primary mt-2 mx-2" href="{% url 'ewalletAdmin:products' %}">Clear</a>
-                </div>
+
             </div>
         </form>
 

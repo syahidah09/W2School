@@ -1,5 +1,7 @@
+
 import json
-import os,math
+import math
+import os
 from datetime import date, datetime, timedelta
 from io import BytesIO
 
@@ -72,7 +74,7 @@ def loginPage(request):
             login(request, user)
             return redirect('/home/')
         else:
-            messages.info(request, 'Username OR password is incorrect')
+            messages.error(request, 'Username OR password is incorrect')
 
     context = {}
     return render(request, "ewallet/login.html", context)
@@ -93,9 +95,12 @@ def user_detail(request):
     }
     return render(request, "ewallet/user_detail.html", context)
 
+
 MY = pytz.timezone('Asia/Kuala_Lumpur')
 today = datetime.now(MY)
 date = "2022-01-18 18:44:12.726799+08:00"
+
+
 @login_required(login_url='/login/')
 def user_update(request):
     user = request.user
@@ -122,31 +127,37 @@ def user_update(request):
 def homepage(request):
     parent = request.user.parent
     student = parent.student_set.all()
-    transaction = parent.transaction_set.all()[:5]    
-    tr=[]
-    for i in parent.transaction_set.all()[:3]:
-        tr.append(i)
-        for j in student:
-            for k in j.transaction_set.all()[:3]:
-                tr.append(k)
-    for i in tr[:5]:
-        print(i.description)
-    ltr=[]
+    parent_transactions = parent.transaction_set.all()
+    # create empty queryset
+    student_transactions = Student.objects.none()
+    # combine all students queryset on transactions
     for i in student:
-        s=[]
-        amount=0        
-        s.append(i.first_name)        
-        tr=i.transaction_set.filter(date__month=today.month)
+        student_transactions = student_transactions | i.transaction_set.all()
+    transactions = parent_transactions | student_transactions
+
+    # order = Order.objects.get(
+    #     parent=parent, complete=False, date_ordered=date)
+    # items = order.orderitem_set.all()
+
+    ltr = []
+    for i in student:
+        s = []
+        amount = 0
+        s.append(i.first_name)
+        tr = i.transaction_set.filter(
+            date__month=today.month, transaction_type="Payment")
         for j in tr:
-            amount+=j.amount
-        s.append(math.ceil(amount))
-        ltr.append(s)        
+            amount += j.amount
+        s.append(round(amount, 1))
+        ltr.append(s)
+    # print(type(ltr),type(tr),type(parent),type(student) )
 
     context = {
         'parent': parent,
         'student': student,
-        'transaction': tr[:5],
-        'ltr':ltr,
+        'transactions': transactions[:5],
+        'ltr': ltr,
+        # 'items': items,
     }
     return render(request, "ewallet/home.html", context)
 
@@ -168,23 +179,23 @@ def wallet_page(request):
 @login_required(login_url='/login/')
 def topup_page(request):
 
-    if request.method == 'POST':        
-        details = TransferForm(request.POST)       
-        if details.is_valid():            
-            post = details.save(commit=False)            
+    if request.method == 'POST':
+        details = TransferForm(request.POST)
+        if details.is_valid():
+            post = details.save(commit=False)
             post.save()
             return HttpResponse("data submitted successfully")
         else:
-            return HttpResponse("data invalid")        
+            return HttpResponse("data invalid")
 
-    else:    
+    else:
         form = TransferForm(None)
         context = {'form': form}
         return render(request, "ewallet/topup.html", context)
 
 
 @login_required(login_url='/login/')
-def reload(request):
+def reload(request, pk):
     user = request.user
     parent = user.parent
     student = parent.student_set.all()
@@ -201,7 +212,8 @@ def reload(request):
             return HttpResponse("data invalid")
 
     else:
-        form = ReloadForm(None)       
+        # student = Student.objects.get(student_id=pk)
+        form = ReloadForm()
         form.fields["student"].queryset = student
 
         context = {
@@ -215,15 +227,26 @@ def reload(request):
 
 @login_required(login_url='/login/')
 def transaction_history(request, page=1):
-    transactions = request.user.parent.transaction_set.all()
-    paginator = Paginator(transactions, 10)  # 10 transactions per page
+    parent = request.user.parent
+    student = parent.student_set.all()
+    parent_transactions = parent.transaction_set.all()
+
+    # paginator = Paginator(transactions, 10)  # 10 transactions per page
+
+    # create empty queryset
+    student_transactions = Student.objects.none()
+    # combine all students queryset on transactions
+    for i in student:
+        student_transactions = student_transactions | i.transaction_set.all()
+
+    transactions = parent_transactions | student_transactions
     myFilter = TransactionFilter(request.GET, queryset=transactions)
     transactions = myFilter.qs
 
-    try:
-        transactions = paginator.page(page)
-    except EmptyPage:       
-        transactions = paginator.page(paginator.num_pages)
+    # try:
+    #     transactions = paginator.page(page)
+    # except EmptyPage:
+    #     transactions = paginator.page(paginator.num_pages)
 
     context = {
         'transactions': transactions,
@@ -248,19 +271,22 @@ def transaction_detail(request, pk):
     }
     return render(request, "ewallet/transaction_detail.html", context)
 
+
 @login_required(login_url='/login/')
 def store(request):
     parent = request.user.parent
     order, created = Order.objects.get_or_create(
         parent=parent, complete=False, date_ordered=date)
-    cartItems = order.get_cart_items   
+    items = order.orderitem_set.all()
+    cartItems = order.get_cart_items
     products = Product.objects.all()
-    myFilter = ProductFilter(request.GET, queryset=products)   
+    myFilter = ProductFilter(request.GET, queryset=products)
 
     context = {
         'products': products,
         'cartItems': cartItems,
         'filter': myFilter,
+        'items': items,
     }
     return render(request, "ewallet/store.html", context)
 
@@ -271,8 +297,8 @@ def updateItem(request):
     productId = data['productId']
     action = data['action']
 
-    # print('Action:', action)
-    # print('productId:', productId)
+    print('Action:', action)
+    print('productId:', productId)
 
     parent = request.user.parent
     product = Product.objects.get(id=productId)
@@ -280,19 +306,29 @@ def updateItem(request):
         parent=parent, complete=False, date_ordered=date)
 
     orderItem, created = OrderItem.objects.get_or_create(
-        order=order, product=product,date_added=date)
+        order=order, product=product, date_added=date)
 
     # print("[updateitem] Order ID: ", order.id)
 
-    if action == 'add':
+    if action == 'added':
         orderItem.quantity = (orderItem.quantity + 1)
+        messages.success(request, 'Product added to your wishlist')
     elif action == 'remove':
         orderItem.quantity = (orderItem.quantity - 1)
+        messages.success(request, 'Quantity decreased, ' +
+                         orderItem.product.name)
+    elif action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+        messages.success(request, 'Quantity increased, ' +
+                         orderItem.product.name)
 
     orderItem.save()
 
     if orderItem.quantity <= 0:
         orderItem.delete()
+    elif action == 'removed':
+        orderItem.delete()
+        messages.warning(request, 'Product removed, ' + orderItem.product.name)
 
     return JsonResponse('Item was added', safe=False)
 
@@ -304,7 +340,7 @@ def cart(request):
         parent=parent, complete=False, date_ordered=date)
     items = order.orderitem_set.all()
     cartItems = order.get_cart_items
-   
+
     context = {
         'items': items,
         'order': order,
@@ -318,12 +354,12 @@ def checkout(request):
     parent = request.user.parent
     student = parent.student_set.all()
     order = Order.objects.get(
-        parent=parent, complete=False,date_ordered=date)
+        parent=parent, complete=False, date_ordered=date)
     items = order.orderitem_set.all()
     cartItems = order.get_cart_items
-   
+
     if request.method == 'POST':
-        details = TransactionForm(request.POST)      
+        details = TransactionForm(request.POST)
         if details.is_valid():
             post = details.save(commit=False)
             order.student = Student.objects.get(
@@ -335,13 +371,13 @@ def checkout(request):
 
     else:
         form = TransactionForm(None)
-        form.fields["student"].queryset = student        
+        form.fields["student"].queryset = student
 
         context = {
             'form': form,
             'items': items,
             'order': order,
-            'cartItems': cartItems,            
+            'cartItems': cartItems,
             'parent': parent,
         }
         return render(request, 'ewallet/checkout.html', context)
@@ -373,7 +409,7 @@ def processOrder(request):
 
 @login_required(login_url='/login/')
 def processTransaction(request):
-    transaction_id = datetime.datetime.now().timestamp()
+    transaction_id = datetime.now().timestamp()
     data = json.loads(request.body)
 
     parent = request.user.parent
@@ -397,7 +433,7 @@ def processTransaction(request):
         parent=parent,
         student=student,
         transaction_id=transaction_id,
-        date=datetime.datetime.now(),
+        date=datetime.now(),
         transaction_type='Payment',
         description='e-Store',
         amount=data['form']['amount'],
@@ -473,54 +509,7 @@ def download_receipt(request, pk):
     story.append(Paragraph("Invoice/Receipt", styleT))
     space = Spacer(cm, 0.8*cm)
 
-    # Build structure
-    InvoiceTable = Table([
-        ["Invoice No.", ":",  transactions.transaction_id],
-        ["Invoice Date", ":", transactions.date.strftime("%d/%m/%Y")]
-    ], [60, 10, 150])
-
-    if transactions.description is not None:
-        DetailTable = Table([
-            ["Name", ":",  transactions.parent],
-            ["Student Name", ":",  transactions.student],
-            ["Description", ":", transactions.description]
-        ], [70, 10, 150])
-    else:
-        DetailTable = Table([
-            ["Name", ":",  transactions.parent],
-            ["Description", ":", transactions.description]
-        ], [70, 10, 150])
-
-    InvoiceDetailTable = Table([
-        [InvoiceTable, DetailTable],
-    ])
-
-    if transactions.description is not None:
-        items = transactions.order.orderitem_set.all()
-        data = [["No.", "Product", "Quantity",
-                 "Unit Price (RM)", "Total (RM)"], ]
-        count = 0
-        for i in items:
-            count += 1
-            data.append([
-                count, i.product, i.quantity,
-                "{:.2f}".format(i.product.price), "{:.2f}".format(i.get_total),
-            ])
-        ProdcuctTable = Table(data, [60, 400, 60, 80, 60])
-    else:
-        data = [["No.", "Transaction Type", "Amount (RM)"], ]
-        data.append([
-            "1", transactions.transaction_type, transactions.amount,
-        ])
-        ProdcuctTable = Table(data, [60, 400, 60, 80, 60])
-
-    ElemTable = Table([
-        [InvoiceDetailTable],
-        [space],
-        [ProdcuctTable],
-    ])
-
-    # Paragraph
+    # Paragraph & its style
     TotalStyle = ParagraphStyle(
         name='Normal',
         alignment=2,
@@ -533,20 +522,55 @@ def download_receipt(request, pk):
     NoteStyle.leftIndent = 10
     OrgStyle = styles['Heading5']
     OrgStyle.alignment = 1
-
-    if transactions.description is not None:
-        Total = Paragraph(text=("Total: RM %.2f" %
-                                (transactions.order.get_cart_total)), style=TotalStyle)
-    else:
-        Total = Paragraph(text=(""), style=TotalStyle)
-
     Note = Paragraph(''' 
         Note: This receipt is computer generated and no signature is required
     ''', NoteStyle)
+    Org = Paragraph('''  Wallet2School  ''', OrgStyle)
 
-    Org = Paragraph(''' 
-        Wallet2School
-    ''', OrgStyle)
+    # Build structure
+    InvoiceTable = Table([
+        ["Invoice No.", ":",  transactions.transaction_id],
+        ["Invoice Date", ":", transactions.date.strftime("%d/%m/%Y")]
+    ], [60, 10, 150])
+
+    if transactions.parent:
+        parent = transactions.parent
+    else:
+        parent = "-"
+    if transactions.description != "-":
+        DetailTable = Table([
+            ["Parent Name", ":",  parent],
+            ["Student Name", ":",  transactions.student],
+            ["Description", ":", transactions.description]
+        ], [70, 10, 150])
+
+        items = transactions.order.orderitem_set.all()
+        data = [["No.", "Product", "Quantity",
+                 "Unit Price (RM)", "Total (RM)"], ]
+        count = 0
+        for i in items:
+            count += 1
+            data.append([
+                count, i.product, i.quantity,
+                "{:.2f}".format(i.product.price), "{:.2f}".format(i.get_total),
+            ])
+        ProdcuctTable = Table(data, [60, 400, 60, 80, 60])
+
+        Total = Paragraph(text=("Total: RM %.2f" %
+                                (transactions.order.get_cart_total)), style=TotalStyle)
+    else:
+        DetailTable = Table([
+            ["Parent Name", ":",  parent],
+            ["Description", ":", transactions.description]
+        ], [70, 10, 150])
+
+        data = [["No.", "Transaction Type", "Amount (RM)"], ]
+        data.append([
+            "1", transactions.transaction_type, "{:.2f}".format(transactions.amount),
+        ])
+        ProdcuctTable = Table(data, [60, 400, 80])
+
+        Total = Paragraph(text=(""), style=TotalStyle)       
 
     # Add table style
     InvoiceTableStyle = TableStyle(
@@ -568,6 +592,17 @@ def download_receipt(request, pk):
         ]
     )
     ProdcuctTable.setStyle(ProdcuctTableStyle)
+
+    # Combine elements
+    InvoiceDetailTable = Table([
+        [InvoiceTable, DetailTable],
+    ])
+
+    ElemTable = Table([
+        [InvoiceDetailTable],
+        [space],
+        [ProdcuctTable],
+    ])
 
     ElemTable2 = Table([
         [ElemTable],

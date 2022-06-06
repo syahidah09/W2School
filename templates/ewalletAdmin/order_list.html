@@ -21,21 +21,21 @@
         <!-- Filter -->
         <form method="get">
             <div class="card card-body mb-2">
-                <h4 class="mt-0"><strong>Filter</strong></h4>
                 <div class="row">
+                    <h4 class="col-1 mt-0 text-center pt-3"><strong>Filter</strong></h4>
                     <!-- {{ filter.form }} -->
-                    {% for form in filter.form %}
-                    <div class="form-group col-sm-4 col-md-3">
-                        {{ form.label_tag }}
-                        {% render_field form class="form-control" %}
+                    <div class="form-group col-sm-4 col-md-3 ">
+                        {{ filter.form.date_ordered.label_tag }}
+                        <div class="d-flex justify-content-between">
+                            {% render_field filter.form.date_ordered class="form-control" placeholder="01/01/2021" %}
+                        </div>
                     </div>
-                    {% endfor %}  
-                </div>
-                <div class="d-flex flex-wrap">
-                    <button type="submit" class="btn btn-primary mt-2">
-                        <i class="fas fa-search"></i> Search
-                    </button>
-                    <a class="btn btn-primary mt-2 mx-2" href="{% url 'ewalletAdmin:orders' %}">Clear</a>
+                    <div class="col-sm-4 col-md-3">
+                        <button type="submit" class="btn btn-primary mt-4">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <a class="btn btn-primary mt-4 mx-2" href="{% url 'ewalletAdmin:orders' %}">Clear</a>
+                    </div>
                 </div>
             </div>
         </form>

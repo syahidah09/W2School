@@ -1,20 +1,24 @@
 import json
-import datetime
-from django.http.response import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
-from django.contrib import messages
-from django.core import serializers
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.core.paginator import Paginator, EmptyPage
+import calendar
+from datetime import date, datetime, timedelta
 
-from ewallet.models import *
+import pytz
+from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
+from django.core import serializers
+from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
+from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 from ewallet.decorators import *
-from .forms import *
+from ewallet.models import *
+
 from .filters import *
+from .forms import *
 from .serializers import *
 
 
@@ -75,18 +79,53 @@ def logoutUser(request):
 
 @login_required(login_url='/admin2/login/')
 def homepage(request):
-    transaction = Transaction.objects.all()
+    transaction = Transaction.objects.filter(
+        transaction_type="Payment", description="Co-op")
     student = Student.objects.all()
     parent = Parent.objects.all()
-
-    total = sum([item.amount for item in transaction])
+    transaction_allpayemnt = Transaction.objects.filter(
+        transaction_type="Payment")
+    total = sum([item.amount for item in transaction_allpayemnt])
     total = "{:.2f}".format(total)
+
+    # total money spent by students class
+    class_name = ("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B",)
+    transaction_by_class = {}
+    for i in class_name:
+        transaction_by_class[i] = 0
+    print(transaction_by_class)
+
+    for i in transaction:
+        print(i.student.class_name)
+        s_class = i.student.class_name
+        test = transaction_by_class.get(s_class)
+        # print("S_class: ", s_class, "S_name: ", i.student, "Amount: ", i.amount, "Total spent in class: ", test, )
+        transaction_by_class[s_class] = test + i.amount
+    print(transaction_by_class)
+
+    MY = pytz.timezone('Asia/Kuala_Lumpur')
+    today = datetime.now(MY)
+    sales_by_month = {}
+    for x in range(1, 13):
+        # get all transaction this year for each month
+        tr = Transaction.objects.filter(
+            date__year=today.year, date__month=x, transaction_type="Payment")
+        amount = 0
+        for j in tr:
+            amount += j.amount
+        sales_by_month[calendar.month_abbr[x]] = amount
+    print(today.month+2)
+    print(today.year)
+    print(sales_by_month)
 
     context = {
         'transaction': transaction,
         'student': student,
         'parent': parent,
         'total': total,
+        'test': transaction_by_class,
+        'test2': sales_by_month,
+        'year': today.year,
     }
     return render(request, "ewalletAdmin/home.html", context)
 
@@ -100,10 +139,9 @@ def homepage(request):
 #     success_url = "/admin2/students/"
 
 
-def StudentCreateView2(request,pk):
+def StudentCreateView2(request, pk):
     User = get_user_model()
-    user = User.objects.get(id=pk)   
-    parent = user.parent
+    user = User.objects.get(id=pk)
     print("pk", pk)
     # print(parent)
     form = StudentForm()
@@ -113,15 +151,19 @@ def StudentCreateView2(request,pk):
         form = StudentForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            form.save()          
-
+            form.save()
             return redirect('/admin2/students/')
         else:
             print("form not valid")
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = StudentForm(initial={'parent': parent}) #initial={'parent': parent}
+        # initial={'parent': parent}
+        if pk == 1:
+            parent = user.parent
+            form = StudentForm(initial={'parent': parent})
+        else:
+            form = StudentForm()
 
     context = {
         'form': form,
@@ -148,15 +190,18 @@ def StudentListView2(request):
     }
     return render(request, 'ewalletAdmin/student_list.html', context)
 
+
 class StudentDetailView(DetailView):
     model = Student
-    fields = ('student_id', 'first_name', 'last_name', 'class_name', 'parent', 'card_id')
+    fields = ('student_id', 'first_name', 'last_name',
+              'class_name', 'parent', 'card_id')
     template_name = 'ewalletAdmin/student_detail.html'
 
 
 class StudentUpdateView(UpdateView):
     model = Student
-    fields = ('student_id', 'first_name', 'last_name', 'class_name', 'parent', 'card_id')
+    fields = ('student_id', 'first_name', 'last_name',
+              'class_name', 'parent', 'card_id')
     template_name = 'ewalletAdmin/student_form.html'
     success_url = "/admin2/students/"
 
@@ -166,8 +211,6 @@ class StudentDeleteView(DeleteView):
     fields = '__all__'
     template_name = 'ewalletAdmin/student_confirm_delete.html'
     success_url = "/admin2/students/"
-
-
 
 
 # -------------- User/Parent Views --------------
@@ -191,12 +234,12 @@ class ParentCreateView(CreateView):
 
 def ParentListView2(request):
     User = get_user_model()
-    user = User.objects.filter(groups__name='parent')       
+    user = User.objects.filter(groups__name='parent')
     user_filter = UserFilter(request.GET, queryset=user)
     user = user_filter.qs
 
     context = {
-        'user': user,     
+        'user': user,
         'filter': user_filter,
     }
     return render(request, "ewalletAdmin/parent_list.html", context)
@@ -215,8 +258,8 @@ def ParentDetailView2(request, pk):
 
 class ParentUpdateView(UpdateView):
     model = Parent
-    fields = [        
-        'phone',        
+    fields = [
+        'phone',
     ]
     template_name = 'ewalletAdmin/parent_form.html'
     success_url = "/admin2/parents/"
@@ -256,13 +299,14 @@ class ProductCreateView(CreateView):
 
 def ProductListView2(request, page=1):
     product = Product.objects.all()
-    product_filter = ProductFilter(request.GET, queryset=product) 
+    product_filter = ProductFilter(request.GET, queryset=product)
     product = product_filter.qs
     context = {
         'product': product,
         'filter': product_filter,
     }
     return render(request, 'ewalletAdmin/product_list.html', context)
+
 
 class ProductDetailView(DetailView):
     model = Product
@@ -391,11 +435,23 @@ def TransactionListView2(request):
     transaction_filter = TransactionFilter(request.GET, queryset=transaction)
     transaction = transaction_filter.qs
 
+    page = request.GET.get('page', 1)
+    paginator = Paginator(transaction, 10)
+    
+    try:        
+        transaction = paginator.page(page)        
+    except PageNotAnInteger:
+        transaction = paginator.page(1)
+    except EmptyPage:        
+        # if we exceed the page limit we return the last page
+        transaction = paginator.page(paginator.num_pages)
+
     context = {
         'transaction': transaction,
         'filter': transaction_filter,
     }
     return render(request, 'ewalletAdmin/transaction_list.html', context)
+
 
 class TransactionDetailView(DetailView):
     model = Transaction
@@ -458,6 +514,7 @@ def OrderListView2(request):
         'filter': order_filter,
     }
     return render(request, 'ewalletAdmin/order_list.html', context)
+
 
 class OrderUpdateView(UpdateView):
     model = Order

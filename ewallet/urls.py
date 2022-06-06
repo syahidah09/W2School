@@ -14,7 +14,7 @@ urlpatterns = [
 
      path('wallet/', views.wallet_page, name='wallet'),
      path('topup/', views.topup_page, name='topup'),
-     path('reload/', views.reload, name='reload'),
+     path('reload/<int:pk>', views.reload, name='reload'),
 
      path('transactions/<int:page>/', views.transaction_history, name='transactions'),
      path('transaction/detail/<int:pk>', views.transaction_detail, name='transaction-detail'),

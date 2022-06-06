@@ -10,7 +10,7 @@
     <div class="container-fluid px-0">
         <div class="row gy-4">
             <div class="d-flex mb-0 align-items-center">
-                <a class="me-3" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left fa-2x"></i></a>
+                <a class="me-3 btn w3-theme-d4 rounded-pill" href="{% url 'ewallet:wallet' %}"> <i class="fas fa-arrow-left"></i></a>
                 <h2 class="me-auto my-0">Reload</h2>
             </div>
         </div>
@@ -34,7 +34,13 @@
 <section class="pb-0 pt-3 mb-3">
     <div class="container-fluid">
         <div class="row gy-4">
-            <p class="mb-0">How much do you want to reload? Your current balance <strong>RM{{ parent.wallet_balance|floatformat:2 }}</strong></p>
+            <div class="col-6 alert alert-warning alert-dismissible fade show visually-hidden mb-0" role="alert" id="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                Not enough balance. Please topup.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <p class="mb-0">How much do you want to reload? Your current balance
+                <strong>RM{{ parent.wallet_balance|floatformat:2 }}</strong></p>
             <form id="form" class="form-horizontal" method="POST" action="">
                 {% csrf_token %}
                 <div class="col-sm-4" id="reload-info">
@@ -44,7 +50,8 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">RM</span>
-                        <input type="number" name="amount" step="any" required="" id="id_amount" class="form-control" placeholder="Enter amount">
+                        <input type="number" name="amount" step="any" required="" id="id_amount" class="form-control"
+                               placeholder="Enter amount">
                     </div>
                 </div>
                 <a class="btn btn-secondary" type="button" href="{% url 'ewallet:wallet' %}">Cancel</a>
@@ -70,8 +77,10 @@
         var pw = '{{ parent.wallet_balance }}'
         if (reloadamount > parseInt(pw)) {
             console.log('Reload amount is bigger than wallet balance')
-            alert('Not enough balance. Please topup.');
-            window.location.href = "{% url 'ewallet:topup' %}"
+            document.getElementById('alert').classList.remove("visually-hidden");
+            $("#alert").fadeTo(2000, 1000).slideUp(1000, function () {
+                $("#alert").slideUp(1000);
+            });             
         } else if (reloadamount == 0) {
             alert('Invalid amount. Minimum amount is RM1.');
         } else {
